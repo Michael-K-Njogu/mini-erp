@@ -192,3 +192,13 @@ export async function getInventoryItem(id) {
     updatedAt: item.updated_at,
   }
 }
+
+export async function adjustStock({ productId, movementType, quantity, reason, notes }) {
+  return apiClient.post('/rpc/adjust_stock', {
+    p_product_id: productId,
+    p_movement_type: movementType,
+    p_quantity: Number(quantity),
+    p_reason: reason,
+    p_notes: notes || null,
+  })
+}
