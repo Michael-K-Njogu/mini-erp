@@ -20,7 +20,7 @@ async function saveCustomer(values) {
   try {
     const customer = await createCustomer(values)
 
-    success(`Customer ${customer.name} created successfully.`)
+    success(`Customer ${customer.name} (${customer.customerNumber}) created successfully.`)
 
     await router.push({
       name: 'customers',
