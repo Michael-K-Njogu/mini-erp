@@ -10,23 +10,10 @@ import DashboardView from '../views/DashboardView.vue'
 
 // Customers
 import CustomersView from '../views/CustomersView.vue'
-import CustomerDetailView from '../views/CustomerDetailView.vue'
 import NewCustomerView from '../views/NewCustomerView.vue'
-import EditCustomerView from '../views/EditCustomerView.vue'
 
 // Orders
 import OrdersView from '../views/OrdersView.vue'
-import OrderDetailView from '../views/OrderDetailView.vue'
-import NewOrderView from '../views/NewOrderView.vue'
-import EditOrderView from '../views/EditOrderView.vue'
-
-// Products
-import ProductsView from '../views/ProductsView.vue'
-import ProductDetailView from '../views/ProductDetailView.vue'
-import NewProductView from '../views/NewProductView.vue'
-
-// Inventory
-import InventoryView from '../views/InventoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -196,6 +183,17 @@ const router = createRouter({
           component: () => import('../views/InventoryView.vue'),
           meta: {
             title: 'Inventory',
+            permission: PERMISSION.INVENTORY_VIEW,
+          },
+        },
+        {
+          path: 'inventory/:id',
+          name: 'inventory-details',
+          component: () => import('../views/InventoryDetailView.vue'),
+          meta: {
+            title: 'Inventory Detail',
+            parent: 'inventory',
+            showBackButton: true,
             permission: PERMISSION.INVENTORY_VIEW,
           },
         },
