@@ -162,9 +162,13 @@ export async function getCustomerAccountSummary(customerId) {
 
   const creditLimit = Number(customer.credit_limit || 0)
 
-  const currentBalance = (customer.orders || [])
-    .filter((order) => order.status === ORDER_STATUS.COMPLETED)
-    .reduce((total, order) => total + Number(order.total_amount || 0), 0)
+  const completedOrders = (customer.orders || []).filter(
+    (order) => order.status === ORDER_STATUS.COMPLETED,
+  )
+  const currentBalance = completedOrders.reduce(
+    (total, order) => total + Number(order.total_amount || 0),
+    0,
+  )
 
   const availableCredit = creditLimit - currentBalance
 
@@ -172,6 +176,10 @@ export async function getCustomerAccountSummary(customerId) {
     creditLimit,
     currentBalance,
     availableCredit,
+    completedOrderCount: completedOrders.length,
+    averageCompletedOrderValue: completedOrders.length
+      ? currentBalance / completedOrders.length
+      : 0,
   }
 }
 
