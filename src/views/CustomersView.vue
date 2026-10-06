@@ -129,6 +129,7 @@ const emptyState = computed(() => {
               <component v-if="isSorted('name')" :is="sortIcon('name')" size="14" />
             </button>
           </th>
+          <th>Customer ID</th>
           <th>
             <button class="sort-button" @click="sortBy('email')">
               Email
@@ -163,6 +164,7 @@ const emptyState = computed(() => {
           class="clickable-row"
         >
           <td>{{ customer.name }}</td>
+          <td>{{ customer.customerNumber || '—' }}</td>
           <td>{{ customer.email }}</td>
           <td>{{ formatCurrency(customer.creditLimit) }}</td>
           <td>{{ getCustomerTypeLabel(customer.customerType) }}</td>
