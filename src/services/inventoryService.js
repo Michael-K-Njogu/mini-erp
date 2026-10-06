@@ -148,7 +148,11 @@ export function getStockStatus(item) {
 export async function getInventoryItem(id) {
   const params = new URLSearchParams()
 
-  params.set('select', INVENTORY_FIELDS)
+  params.set(
+    'select',
+    'id,product_id,quantity_on_hand,quantity_reserved,reorder_level,created_at,updated_at',
+  )
+
   params.set('id', `eq.${id}`)
 
   const data = await apiClient.get(`/inventory?${params.toString()}`)
@@ -157,5 +161,34 @@ export async function getInventoryItem(id) {
     throw new Error('Inventory item not found.')
   }
 
-  return mapInventoryItem(data[0])
+  const item = data[0]
+
+  const productParams = new URLSearchParams()
+
+  productParams.set('select', 'id,name,sku')
+  productParams.set('id', `eq.${item.product_id}`)
+
+  const products = await apiClient.get(`/products?${productParams.toString()}`)
+
+  const product = products[0] || null
+
+  return {
+    id: item.id,
+    productId: item.product_id,
+
+    product: product
+      ? {
+          id: product.id,
+          name: product.name,
+          sku: product.sku,
+        }
+      : null,
+
+    quantityOnHand: Number(item.quantity_on_hand ?? 0),
+    quantityReserved: Number(item.quantity_reserved ?? 0),
+    reorderLevel: Number(item.reorder_level ?? 0),
+
+    createdAt: item.created_at,
+    updatedAt: item.updated_at,
+  }
 }
