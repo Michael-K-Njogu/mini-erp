@@ -34,15 +34,12 @@ function customerTypeLabel(type) {
     <div class="customer-profile-summary">
       <div class="customer-profile-heading">
         <h2>{{ customer.name || 'Unnamed customer' }}</h2>
-        <BaseBadge variant="info">
-          {{ customerTypeLabel(customer.customerType) }}
-        </BaseBadge>
       </div>
 
       <div class="customer-profile-meta">
-        <span v-if="customer.sector">{{ customer.sector }}</span>
-        <span v-if="customer.region">{{ customer.region }}</span>
-        <span v-if="customer.contactPerson">Contact: {{ customer.contactPerson }}</span>
+        <span v-if="customer.customerNumber" class="customer-number">
+          {{ customer.customerNumber }}
+        </span>
       </div>
     </div>
 
@@ -128,6 +125,12 @@ function customerTypeLabel(type) {
   background: var(--bg-colour-default);
   border-radius: var(--border-radius-full);
   padding: 4px 9px;
+}
+
+.customer-profile-meta .customer-number {
+  background: var(--bg-info-muted);
+  color: var(--text-colour-accent);
+  font-weight: 600;
 }
 
 .customer-profile-links {
