@@ -63,6 +63,7 @@ function mapOrderToApi(order) {
 export async function getOrders({
   query = '',
   status = '',
+  customerId = '',
   sort,
   page = 1,
   pageSize = 10,
@@ -86,6 +87,10 @@ export async function getOrders({
 
   if (status) {
     params.set('status', `eq.${status}`)
+  }
+
+  if (customerId) {
+    params.set('customer_id', `eq.${customerId}`)
   }
 
   if (sort) {
