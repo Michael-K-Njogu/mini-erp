@@ -1,10 +1,12 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import PageToolbar from './../layouts/PageToolbar.vue'
 import BaseBadge from './../components/base/BaseBadge.vue'
 import { getInventory, getStockStatus, getAvailableQuantity } from '../services/inventoryService'
 
+const router = useRouter()
 const inventory = ref([])
 const loading = ref(false)
 const error = ref('')
@@ -72,6 +74,15 @@ function getStockStatusVariant(status) {
   return variants[status] || 'default'
 }
 
+function viewInventory(item) {
+  router.push({
+    name: 'inventory-details',
+    params: {
+      id: item.id,
+    },
+  })
+}
+
 onMounted(loadInventory)
 </script>
 
@@ -108,53 +119,60 @@ onMounted(loadInventory)
         No inventory items found.
       </div>
 
-      <table v-else class="data-table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>SKU</th>
-            <th>On hand</th>
-            <th>Reserved</th>
-            <th>Available</th>
-            <th>Reorder level</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+      <div v-else class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>On hand</th>
+              <th>Reserved</th>
+              <th>Available</th>
+              <th>Reorder level</th>
+              <th>Status</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr v-for="item in filteredInventory" :key="item.id">
-            <td>
-              {{ item.product?.name || 'Unknown product' }}
-            </td>
+          <tbody>
+            <tr
+              class="clickable-row"
+              v-for="item in filteredInventory"
+              :key="item.id"
+              @click="viewInventory(item)"
+            >
+              <td>
+                {{ item.product?.name || 'Unknown product' }}
+              </td>
 
-            <td>
-              {{ item.product?.sku || '—' }}
-            </td>
+              <td>
+                {{ item.product?.sku || '—' }}
+              </td>
 
-            <td>
-              {{ formatQuantity(item.quantityOnHand) }}
-            </td>
+              <td>
+                {{ formatQuantity(item.quantityOnHand) }}
+              </td>
 
-            <td>
-              {{ formatQuantity(item.quantityReserved) }}
-            </td>
+              <td>
+                {{ formatQuantity(item.quantityReserved) }}
+              </td>
 
-            <td>
-              {{ formatQuantity(getAvailableQuantity(item)) }}
-            </td>
+              <td>
+                {{ formatQuantity(getAvailableQuantity(item)) }}
+              </td>
 
-            <td>
-              {{ formatQuantity(item.reorderLevel) }}
-            </td>
+              <td>
+                {{ formatQuantity(item.reorderLevel) }}
+              </td>
 
-            <td>
-              <BaseBadge :variant="getStockStatusVariant(getStockStatus(item))">
-                {{ getStockStatusLabel(getStockStatus(item)) }}
-              </BaseBadge>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <td>
+                <BaseBadge :variant="getStockStatusVariant(getStockStatus(item))">
+                  {{ getStockStatusLabel(getStockStatus(item)) }}
+                </BaseBadge>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
