@@ -1,5 +1,6 @@
 import { apiClient } from '../api/apiClient'
 import { ORDER_STATUS } from '../constants/orderStatuses'
+import { generateCustomerNumber } from '../utils/customerNumber'
 import { uploadCustomerImage, deleteCustomerImage } from './storageService'
 
 const SORT_FIELD_MAP = {
@@ -14,6 +15,7 @@ const SORT_FIELD_MAP = {
 
 export const CUSTOMER_FIELDS = {
   id: 'id',
+  customerNumber: 'customer_number',
 
   name: 'name',
   customerType: 'customer_type',
@@ -40,6 +42,7 @@ export const CUSTOMER_FIELDS = {
 function mapCustomer(customer) {
   return {
     id: customer.id,
+    customerNumber: customer.customer_number,
 
     name: customer.name,
     customerType: customer.customer_type,
@@ -104,7 +107,10 @@ export async function getCustomers({
   params.set('select', '*, orders(count)')
 
   if (query) {
-    params.set('or', `(name.ilike.*${query}*,email.ilike.*${query}*)`)
+    params.set(
+      'or',
+      `(customer_number.ilike.*${query}*,name.ilike.*${query}*,email.ilike.*${query}*)`,
+    )
   }
 
   if (customerType) {
@@ -184,11 +190,18 @@ export async function getCustomerAccountSummary(customerId) {
 }
 
 export async function createCustomer(customer) {
-  const createdCustomers = await apiClient.post('/customers', mapCustomerToApi(customer), {
-    headers: {
-      Prefer: 'return=representation',
+  const createdCustomers = await apiClient.post(
+    '/customers',
+    {
+      ...mapCustomerToApi(customer),
+      customer_number: generateCustomerNumber(),
     },
-  })
+    {
+      headers: {
+        Prefer: 'return=representation',
+      },
+    },
+  )
 
   const createdCustomer = createdCustomers[0]
 
