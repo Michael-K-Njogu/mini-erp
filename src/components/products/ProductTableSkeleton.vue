@@ -8,16 +8,21 @@ const { rows } = defineProps({
   },
 })
 
-const columns = 7 // Assuming there are 7 columns in the product table
+const columns = 7
 </script>
 
 <template>
   <div class="data-table-skeleton">
-    <div class="data-table-skeleton__header">
+    <div class="data-table-skeleton__header" :style="{ '--skeleton-columns': columns }">
       <BaseSkeleton v-for="col in columns" :key="col" width="100%" height="20px" />
     </div>
 
-    <div v-for="row in rows" :key="row" class="data-table-skeleton__row">
+    <div
+      v-for="row in rows"
+      :key="row"
+      class="data-table-skeleton__row"
+      :style="{ '--skeleton-columns': columns }"
+    >
       <BaseSkeleton v-for="col in columns" :key="col" width="100%" height="20px" />
     </div>
   </div>
