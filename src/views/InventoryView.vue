@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 
 import PageToolbar from './../layouts/PageToolbar.vue'
 import BaseBadge from './../components/base/BaseBadge.vue'
+import InventoryTableSkeleton from '../components/inventory/InventoryTableSkeleton.vue'
 import { getInventory, getStockStatus, getAvailableQuantity } from '../services/inventoryService'
 
 const router = useRouter()
@@ -109,7 +110,7 @@ onMounted(loadInventory)
     </PageToolbar>
 
     <div class="page-body">
-      <div v-if="loading" class="state-message">Loading inventory...</div>
+      <InventoryTableSkeleton v-if="loading" :rows="5" />
 
       <div v-else-if="error" class="state-message error">
         {{ error }}
