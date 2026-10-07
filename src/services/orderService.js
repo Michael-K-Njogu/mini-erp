@@ -35,12 +35,23 @@ function mapOrder(order) {
 
     createdAt: order.created_at,
     updatedAt: order.updated_at,
+    createdBy: order.created_by,
+    createdByName: order.created_by_name,
+    updatedBy: order.updated_by,
+    updatedByName: order.updated_by_name,
 
-    // Map the new timestamp fields
     postedAt: order.posted_at,
+    postedBy: order.posted_by,
+    postedByName: order.posted_by_name,
     processingStartedAt: order.processing_started_at,
+    processingStartedBy: order.processing_started_by,
+    processingStartedByName: order.processing_started_by_name,
     completedAt: order.completed_at,
+    completedBy: order.completed_by,
+    completedByName: order.completed_by_name,
     canceledAt: order.canceled_at,
+    canceledBy: order.canceled_by,
+    canceledByName: order.canceled_by_name,
   }
 }
 
@@ -52,7 +63,6 @@ function mapOrderToApi(order) {
     status: order.status,
     notes: order.notes,
 
-    // Map the new timestamp fields
     posted_at: order.postedAt,
     processing_started_at: order.processingStartedAt,
     completed_at: order.completedAt,
