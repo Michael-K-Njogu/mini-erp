@@ -23,6 +23,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
+  showGrandTotal: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const grandTotal = computed(() => calculateGrandTotal(props.items))
@@ -60,12 +65,14 @@ const emit = defineEmits(['edit', 'delete'])
     <tbody>
       <tr v-for="item in items" :key="item.id">
         <td>
-          <div class="product-name">
-            {{ item.productName }}
-          </div>
-
-          <div class="product-sku">
-            {{ item.sku }}
+          <div class="order-item-product">
+            <div class="order-item-image-placeholder" aria-hidden="true">
+              <Package :size="20" />
+            </div>
+            <div class="order-item-product-details">
+              <div class="product-name">{{ item.productName }}</div>
+              <div class="product-sku">{{ item.sku }}</div>
+            </div>
           </div>
         </td>
 
@@ -114,7 +121,7 @@ const emit = defineEmits(['edit', 'delete'])
         </td>
       </tr>
     </tbody>
-    <tfoot v-if="items.length">
+    <tfoot v-if="showGrandTotal && items.length">
       <tr class="order-total-row">
         <td :colspan="editable ? 5 : 4">Grand Total</td>
 
@@ -125,3 +132,39 @@ const emit = defineEmits(['edit', 'delete'])
     </tfoot>
   </table>
 </template>
+
+<style scoped>
+.order-item-product {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-width: 190px;
+}
+
+.order-item-image-placeholder {
+  align-items: center;
+  background: linear-gradient(145deg, var(--bg-info-muted), var(--bg-colour-default));
+  border: 1px solid var(--border-colour-subtle);
+  border-radius: var(--border-radius-md);
+  color: var(--text-colour-accent);
+  display: flex;
+  flex: 0 0 48px;
+  height: 48px;
+  justify-content: center;
+}
+
+.order-item-product-details {
+  min-width: 0;
+}
+
+.order-item-product-details .product-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.order-item-product-details .product-sku {
+  color: var(--text-colour-secondary);
+  font-size: 12px;
+  margin-top: 3px;
+}
+</style>
