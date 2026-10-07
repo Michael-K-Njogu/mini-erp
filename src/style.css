@@ -996,7 +996,7 @@ td {
 .data-table-skeleton__header,
 .data-table-skeleton__row {
   display: grid;
-  grid-template-columns: auto auto auto auto auto auto auto;
+  grid-template-columns: repeat(var(--skeleton-columns, 7), minmax(0, 1fr));
 
   gap: 1rem;
 
