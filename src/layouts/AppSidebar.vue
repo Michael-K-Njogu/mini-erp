@@ -5,8 +5,6 @@ import { navigation } from '../config/navigation.js'
 import { usePermissions } from '../composables/usePermissions.js'
 
 import SidebarNavItem from '../components/SidebarNavItem.vue'
-import BaseButton from '../components/base/BaseButton.vue'
-import { LogOut } from '@lucide/vue'
 
 const { hasPermission } = usePermissions()
 
