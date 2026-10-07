@@ -34,9 +34,9 @@ import { printInvoice } from '../utils/printInvoice.js'
 
 import { usePermissions } from '../composables/usePermissions'
 import { PERMISSION } from '../constants/permissions'
+import { formatCurrency } from '../utils/formatters.js'
 
 import PageToolbar from '../layouts/PageToolbar.vue'
-import OrderCard from '../components/orders/OrderCard.vue'
 import OrderTimeline from '../components/orders/OrderTimeline.vue'
 import OrderItemTable from '../components/order-items/OrderItemTable.vue'
 import AddOrderItemModal from '../components/order-items/AddOrderItemModal.vue'
@@ -79,6 +79,7 @@ const showCancelModal = ref(false)
 const showAddItemModal = ref(false)
 const showDeleteModal = ref(false)
 const showInvoicePreview = ref(false)
+const customerLoading = ref(false)
 
 const selectedOrderItem = ref(null)
 const editingOrderItem = ref(null)
@@ -232,8 +233,12 @@ watch(
   async (customerId) => {
     if (!customerId) {
       customer.value = null
+      customerLoading.value = false
       return
     }
+
+    customer.value = null
+    customerLoading.value = true
 
     try {
       customer.value = await getCustomerById(customerId)
@@ -241,6 +246,8 @@ watch(
       console.error('Failed to load customer:', err)
 
       showError(err.message || 'Unable to load customer information.')
+    } finally {
+      customerLoading.value = false
     }
   },
   {
@@ -546,52 +553,129 @@ function handleCloseOrderItemModal() {
     </template>
   </PageToolbar>
 
-  <div class="row">
-    <div class="column">
-      <OrderCard v-if="order" :order="order" :summary="summary" />
+  <main class="order-detail-page">
+    <div
+      v-if="loading"
+      class="order-detail-skeleton"
+      role="status"
+      aria-label="Loading order details"
+    >
+      <BaseSkeleton height="28rem" />
+      <div>
+        <BaseSkeleton height="16rem" />
+        <BaseSkeleton height="22rem" />
+      </div>
     </div>
 
-    <div class="column">
-      <OrderTimeline v-if="order" :order="order" />
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      <h3>Order Items</h3>
-
-      <BaseButton
-        v-if="canEditOrder"
-        id="add-order-item"
-        name="add-order-item"
-        label="Add Item"
-        size="sm"
-        @click="((selectedOrderItem = null), (showAddItemModal = true))"
-      >
-        <template #icon>
-          <Plus size="20" />
-        </template>
-      </BaseButton>
+    <div v-else-if="error" class="order-error" role="alert">
+      <strong>Unable to load this order</strong>
+      <p>{{ error }}</p>
     </div>
 
-    <div class="card-body">
-      <OrderItemTable
-        :items="orderItems"
-        :loading="loadingOrderItems"
-        :editable="canEditOrder"
-        @edit="handleEditOrderItem"
-        @delete="handleDeleteOrderItem"
-      >
-        <template #actions>
-          <BaseButton v-if="canEditOrder" label="Add First Item" @click="showAddItemModal = true">
-            <template #icon>
-              <Plus size="20" />
-            </template>
-          </BaseButton>
-        </template>
-      </OrderItemTable>
+    <div v-else-if="!order" class="order-error" role="status">
+      <strong>Order not found</strong>
+      <p>This order may have been removed or you may not have access to it.</p>
     </div>
-  </div>
+
+    <div v-else-if="order" class="order-detail-content">
+      <div class="order-detail-layout">
+        <div class="order-detail-main">
+          <section class="order-customer-card card" aria-label="Order customer">
+            <div v-if="customer" class="order-customer-content">
+              <div class="order-customer-identity">
+                <div class="order-customer-avatar" aria-hidden="true">
+                  {{ customer.name?.trim()?.charAt(0)?.toUpperCase() || '?' }}
+                </div>
+                <div class="order-customer-name">
+                  <span class="order-customer-label">Customer</span>
+                  <strong>{{ customer.name || 'Unnamed customer' }}</strong>
+                  <span v-if="customer.customerNumber">{{ customer.customerNumber }}</span>
+                </div>
+              </div>
+
+              <RouterLink
+                :to="{ name: 'customer-details', params: { id: customer.id } }"
+                class="order-sidebar-link"
+              >
+                View profile
+              </RouterLink>
+            </div>
+            <p v-else-if="customerLoading" class="order-customer-loading" role="status">
+              Loading customer details…
+            </p>
+            <p v-else class="order-customer-loading">Customer details are unavailable.</p>
+          </section>
+
+          <section class="order-items-card card" aria-labelledby="order-items-title">
+            <header class="order-items-header">
+              <div>
+                <h2 id="order-items-title">Items in this order</h2>
+                <p>
+                  {{ summary.totalItems }} {{ summary.totalItems === 1 ? 'item' : 'items' }}
+                  <span aria-hidden="true">·</span>
+                  Review quantities, pricing, and discounts.
+                </p>
+              </div>
+
+              <BaseButton
+                v-if="canEditOrder"
+                id="add-order-item"
+                name="add-order-item"
+                label="Add item"
+                size="sm"
+                @click="((selectedOrderItem = null), (showAddItemModal = true))"
+              >
+                <template #icon>
+                  <Plus size="18" />
+                </template>
+              </BaseButton>
+            </header>
+
+            <div class="order-items-body">
+              <OrderItemTable
+                :items="orderItems"
+                :loading="loadingOrderItems"
+                :editable="canEditOrder"
+                :show-grand-total="false"
+                @edit="handleEditOrderItem"
+                @delete="handleDeleteOrderItem"
+              >
+                <template #actions>
+                  <BaseButton
+                    v-if="canEditOrder"
+                    label="Add first item"
+                    @click="showAddItemModal = true"
+                  >
+                    <template #icon>
+                      <Plus size="20" />
+                    </template>
+                  </BaseButton>
+                </template>
+              </OrderItemTable>
+            </div>
+            <footer class="order-summary" aria-label="Order totals">
+              <div class="order-summary-stat">
+                <span>Subtotal</span>
+                <strong>{{ formatCurrency(summary.subtotal) }}</strong>
+              </div>
+              <div class="order-summary-stat">
+                <span>Total discount</span>
+                <strong>{{ formatCurrency(summary.totalDiscount) }}</strong>
+              </div>
+              <div class="order-summary-total">
+                <span>Grand total</span>
+                <strong>{{ formatCurrency(summary.grandTotal) }}</strong>
+              </div>
+            </footer>
+          </section>
+        </div>
+
+        <aside class="order-detail-sidebar" aria-label="Order information">
+          <OrderTimeline :order="order" />
+        </aside>
+      </div>
+    </div>
+  </main>
 
   <BaseConfirmationModal
     v-if="order"
@@ -653,7 +737,282 @@ function handleCloseOrderItemModal() {
 </template>
 
 <style scoped>
+.order-detail-page {
+  min-width: 0;
+}
+
+.order-detail-skeleton {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 350px);
+}
+
+.order-detail-skeleton > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-error {
+  background: var(--bg-danger-muted);
+  border: 1px solid var(--border-danger);
+  border-radius: 6px;
+  color: var(--text-colour-danger);
+  padding: 16px 20px;
+}
+
+.order-error p {
+  margin: 6px 0 0;
+}
+
+.order-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.order-detail-layout {
+  align-items: start;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 350px);
+}
+
+.order-detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.order-items-card {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.order-items-header {
+  align-items: center;
+  border-bottom: 1px solid var(--border-colour-subtle);
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.order-items-header h2,
+.order-sidebar-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.order-items-header p {
+  color: var(--text-colour-secondary);
+  font-size: 13px;
+  margin: 5px 0 0;
+}
+
+.order-items-header p span {
+  margin: 0 4px;
+}
+
+.order-summary {
+  align-items: stretch;
+  border-top: 1px solid var(--border-colour-subtle);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(180px, 0.8fr);
+  padding: 16px 24px;
+}
+
+.order-summary-stat,
+.order-summary-total {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+  min-width: 0;
+  padding: 4px 14px;
+}
+
+.order-summary-stat:first-child {
+  padding-left: 0;
+}
+
+.order-summary-stat span,
+.order-summary-total span {
+  color: var(--text-colour-secondary);
+  font-size: 12px;
+}
+
+.order-summary-stat strong {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.order-summary-total {
+  background: var(--bg-info-muted);
+  border: 1px solid var(--border-info);
+  border-radius: var(--border-radius-md);
+  padding: 10px 14px;
+}
+
+.order-summary-total strong {
+  color: var(--text-colour-accent);
+  font-size: 18px;
+}
+
+.order-items-body {
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0 16px 16px;
+}
+
+.order-detail-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.order-detail-sidebar :deep(.order-timeline-card) {
+  margin: 0;
+  min-width: 0;
+}
+
+.order-customer-card {
+  margin: 0;
+  padding: 14px 18px;
+}
+
+.order-sidebar-link {
+  color: var(--text-colour-accent);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.order-sidebar-link:hover {
+  text-decoration: underline;
+}
+
+.order-customer-content {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.order-customer-identity {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+
+.order-customer-avatar {
+  align-items: center;
+  background: var(--bg-info-muted);
+  border: 1px solid var(--border-colour-subtle);
+  border-radius: 50%;
+  color: var(--text-colour-accent);
+  display: flex;
+  flex: 0 0 42px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 42px;
+  justify-content: center;
+}
+
+.order-customer-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.order-customer-label {
+  color: var(--text-colour-secondary);
+  font-size: 11px;
+}
+
+.order-customer-identity strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.order-customer-identity span {
+  color: var(--text-colour-secondary);
+  font-size: 12px;
+}
+
+.order-customer-loading {
+  color: var(--text-colour-secondary);
+  font-size: 13px;
+  margin: 0;
+}
+
 #invoice-print-container {
   display: none;
+}
+
+@media (max-width: 960px) {
+  .order-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .order-detail-skeleton {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .order-detail-skeleton > div:last-child {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .order-detail-skeleton > div:last-child {
+    display: flex;
+  }
+
+  .order-items-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .order-items-body {
+    padding: 0 12px 12px;
+  }
+
+  .order-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px 12px;
+  }
+
+  .order-summary-stat {
+    border-bottom: 1px solid var(--border-colour-subtle);
+    padding: 10px 8px;
+  }
+
+  .order-summary-stat:first-child {
+    padding-left: 8px;
+  }
+
+  .order-summary-total {
+    grid-column: 1 / -1;
+  }
+
+  .order-customer-content {
+    gap: 8px;
+  }
+
+  .order-customer-card {
+    padding: 12px 14px;
+  }
 }
 </style>
