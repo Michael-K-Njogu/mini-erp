@@ -2,10 +2,10 @@
 import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import PageToolbar from './../layouts/PageToolbar.vue'
-import BaseBadge from './../components/base/BaseBadge.vue'
+import InventoryTable from '../components/inventory/InventoryTable.vue'
 import InventoryTableSkeleton from '../components/inventory/InventoryTableSkeleton.vue'
-import { getInventory, getStockStatus, getAvailableQuantity } from '../services/inventoryService'
+import PageToolbar from '../layouts/PageToolbar.vue'
+import { getInventory, getStockStatus } from '../services/inventoryService'
 
 const router = useRouter()
 const inventory = ref([])
@@ -51,35 +51,11 @@ async function loadInventory() {
   }
 }
 
-function formatQuantity(value) {
-  return new Intl.NumberFormat().format(value)
-}
-
-function getStockStatusLabel(item) {
-  const status = getStockStatus(item)
-
-  return {
-    'in-stock': 'In stock',
-    'low-stock': 'Low stock',
-    'out-of-stock': 'Out of stock',
-  }[status]
-}
-
-function getStockStatusVariant(status) {
-  const variants = {
-    'in-stock': 'success',
-    'low-stock': 'warning',
-    'out-of-stock': 'danger',
-  }
-
-  return variants[status] || 'default'
-}
-
-function viewInventory(item) {
+function viewInventory(id) {
   router.push({
     name: 'inventory-details',
     params: {
-      id: item.id,
+      id,
     },
   })
 }
@@ -120,60 +96,7 @@ onMounted(loadInventory)
         No inventory items found.
       </div>
 
-      <div v-else class="data-table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>SKU</th>
-              <th>On hand</th>
-              <th>Reserved</th>
-              <th>Available</th>
-              <th>Reorder level</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr
-              class="clickable-row"
-              v-for="item in filteredInventory"
-              :key="item.id"
-              @click="viewInventory(item)"
-            >
-              <td>
-                {{ item.product?.name || 'Unknown product' }}
-              </td>
-
-              <td>
-                {{ item.product?.sku || '—' }}
-              </td>
-
-              <td>
-                {{ formatQuantity(item.quantityOnHand) }}
-              </td>
-
-              <td>
-                {{ formatQuantity(item.quantityReserved) }}
-              </td>
-
-              <td>
-                {{ formatQuantity(getAvailableQuantity(item)) }}
-              </td>
-
-              <td>
-                {{ formatQuantity(item.reorderLevel) }}
-              </td>
-
-              <td>
-                <BaseBadge :variant="getStockStatusVariant(getStockStatus(item))">
-                  {{ getStockStatusLabel(getStockStatus(item)) }}
-                </BaseBadge>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <InventoryTable v-else :inventory="filteredInventory" @view="viewInventory" />
     </div>
   </div>
 </template>
