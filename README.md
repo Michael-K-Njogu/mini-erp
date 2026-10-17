@@ -10,17 +10,25 @@ browser-mocked API development evolve alongside the business features.
 
 ## Features
 
-- Customer management with account summaries and order timelines
-- Product catalog with categories, units, pricing, and stock quantities
+- Customer management with auto-generated customer numbers (`CUST-YYMMDD-####`),
+  tabbed profiles (Overview, Orders, Credit & account), and avatar initials
+- Product catalog with categories, units, pricing, image placeholders, and a
+  redesigned product detail page
+- Inventory overview and detail pages with stock movement history and stock
+  adjustments
 - Sales-order management, including order items, discounts, totals, and lifecycle
-  transitions
+  transitions (Draft, Pending, Processing, Completed, Canceled)
+- Order detail page with a customer strip, itemised totals, and an order timeline
+  showing who performed each stage
+- Dashboard with a personalised "Welcome Back" greeting
 - Customer credit calculations and invoice preview with browser printing
 - Search, filtering, sorting, and pagination on list views
 - Notifications with unread counts, read-state actions, and entity navigation
 - Supabase authentication, session protection, sign-in, and sign-out
 - Role-based permissions for Admin, Sales, Operations, and Accounting users
 - Reusable Vue components for forms, buttons, modals, inputs, selects, badges,
-  alerts, empty states, and loading skeletons
+  alerts, empty states, and layout-matched loading skeletons for tables and
+  detail pages
 - MSW browser mocks for local development
 
 The Mini ERP is under active development; see the roadmap for completed
@@ -106,19 +114,37 @@ are added.
 src/
 	api/          API and Supabase clients
 	business/     Business rules, calculations, transitions, and permissions
-	components/   Shared UI and feature components
+	components/   Shared UI (base/) and feature components (customers, dashboard,
+	              inventory, invoices, notifications, order-items, orders,
+	              products, toast, user)
 	composables/  Reusable Vue state and data logic
-	constants/    Statuses, roles, categories, and other domain values
+	config/       Navigation configuration
+	constants/    Statuses, roles, permissions, stock movement types, and other
+	              domain values
 	layouts/      Application-wide page layouts
 	mappers/      API/domain data mapping
 	mocks/        MSW handlers and seeded development data
 	router/       Routes and authentication/permission guards
 	services/     API-facing service modules
 	styles/       Shared feature styles and design variables
-	utils/        Formatting, numbering, printing, and navigation helpers
+	utils/        Formatting, order/customer numbering, printing, and navigation helpers
 	validation/   Zod validation schemas
 	views/        Route-level pages
+supabase/
+	migrations/   SQL migrations (customer_number, order actor audit)
 ```
+
+## Database Migrations
+
+SQL migrations live in `supabase/migrations/`. Apply them to your Supabase project
+(SQL editor or `supabase db push`) before using the related features:
+
+- `add_customer_number`: adds the `customer_number` column to `customers`
+- `add_order_actor_audit`: adds created/updated/stage actor columns and a trigger
+  on `orders` that records the acting user
+
+Customer numbers are generated in `src/utils/customerNumber.js` when a customer is
+created.
 
 ## Development Notes
 
