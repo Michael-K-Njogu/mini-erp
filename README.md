@@ -67,6 +67,7 @@ VITE_API_URL=http://localhost:8000/api
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_USE_MSW=false
+VITE_ENABLE_DEMO=false
 ```
 
 Start the development server:
@@ -76,6 +77,37 @@ npm run dev
 ```
 
 Vite will print the local URL, normally `http://localhost:5173`.
+
+## Public Demo Mode
+
+The app can run as a public demo where visitors click **Try the demo** on the login
+page instead of signing in. This uses Supabase anonymous sign-in, so every visitor
+gets a private, pre-seeded workspace with full CRUD access.
+
+1. Create a **separate** Supabase project for the demo (never reuse production).
+2. Enable **Authentication → Sign In / Providers → Allow anonymous sign-ins**.
+3. Apply every file in `supabase/migrations/` in order (SQL editor or
+   `supabase db push`). `20261001000000_baseline_schema.sql` and
+   `20261008000000_demo_mode.sql` are for the demo project only.
+4. Put the demo project's URL and anon key in `.env.demo` (git-ignored) with
+   `VITE_ENABLE_DEMO=true`, then run `npm run dev:demo`. Plain `npm run dev` keeps
+   using `.env`, so you can switch between the main and demo projects. On the
+   hosting provider, set the same variables.
+
+The demo migration adds:
+
+- `owner_id` columns with row level security, so visitors only see their own data
+- a sign-up trigger that creates an Admin profile and seeds sample customers,
+  products, inventory, orders, and notifications
+- `reset_demo_data()` (used by the banner's **Reset data** button)
+- per-user row caps and an hourly `pg_cron` job that deletes anonymous users and
+  their data after 24 hours
+- a size- and type-restricted `customer-images` storage bucket
+
+`netlify.toml` configures the Netlify build and rewrites all routes to `index.html`
+so deep links work. Vite embeds `VITE_*` values at build time, so each Netlify site
+targets one Supabase project: create one site with the demo project's variables
+(`VITE_ENABLE_DEMO=true`) and, if wanted, a second site with the main project's.
 
 ## Local Mocking
 
@@ -95,6 +127,8 @@ by MSW and is intentionally tracked in the repository.
 
 ```bash
 npm run dev           # Start the Vite development server
+npm run dev:demo      # Start the dev server against the demo project (.env.demo)
+npm run build:demo    # Production build using .env.demo
 npm run build         # Create a production build in dist/
 npm run preview       # Preview the production build locally
 npm run format        # Format supported project files with Prettier
@@ -131,7 +165,8 @@ src/
 	validation/   Zod validation schemas
 	views/        Route-level pages
 supabase/
-	migrations/   SQL migrations (customer_number, order actor audit)
+	migrations/   SQL migrations (baseline schema, customer_number, order actor
+	              audit, demo mode)
 ```
 
 ## Database Migrations
