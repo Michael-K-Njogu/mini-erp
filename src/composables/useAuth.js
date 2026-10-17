@@ -1,6 +1,11 @@
 import { ref, computed } from 'vue'
 
-import { getSession, onAuthStateChange, signOut as signOutUser } from '../services/authService'
+import {
+  getSession,
+  onAuthStateChange,
+  signInAnonymously,
+  signOut as signOutUser,
+} from '../services/authService'
 
 import { getProfileById } from '../services/profileService'
 
@@ -63,7 +68,17 @@ async function signOut() {
   profile.value = null
 }
 
+async function signInAsDemo() {
+  const data = await signInAnonymously()
+
+  session.value = data.session
+  user.value = data.user
+
+  await loadProfile()
+}
+
 const isAuthenticated = computed(() => !!session.value)
+const isDemo = computed(() => !!user.value?.is_anonymous)
 
 export function useAuth() {
   return {
@@ -71,9 +86,11 @@ export function useAuth() {
     session,
     profile,
     isAuthenticated,
+    isDemo,
     initialized,
 
     initialize,
     signOut,
+    signInAsDemo,
   }
 }
