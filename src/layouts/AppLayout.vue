@@ -1,6 +1,7 @@
 <script setup>
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
+import DemoBanner from '../components/DemoBanner.vue'
 </script>
 
 <template>
@@ -8,6 +9,7 @@ import AppHeader from './AppHeader.vue'
     <AppSidebar />
 
     <main class="app-main">
+      <DemoBanner />
       <AppHeader />
       <div id="page-toolbar-root" class="page-toolbar-region"></div>
       <div class="page-content">
