@@ -1,26 +1,30 @@
-# Frappe UI Lab
+# Mykie's Mini ERP
 
-Frappe UI Lab is a Vue 3 CRM for a building-materials business. It provides the
-day-to-day screens needed to manage customers, products, orders, order items, and
-notifications, with Supabase-backed authentication and data access.
+This is a Mini ERP for managing the day-to-day operations of any business. It brings customer, product, and sales-order workflows together, with role-aware access, account credit calculations, and invoice previews.
 
-The project is also a working UI lab: reusable form controls, permission-aware
-navigation, responsive layouts, loading states, validation, and browser-mocked API
-development are kept close to the product features so they can be evolved together.
+The application is being built out as an operational hub. Its current workflows
+are backed by Supabase, while reporting, invoicing and payments, and deeper
+inventory management are part of the roadmap. The project also serves as a UI
+lab: reusable controls, responsive layouts, validation, loading states, and
+browser-mocked API development evolve alongside the business features.
 
 ## Features
 
-- Customer, product, and order CRUD workflows
-- Order items, discounts, totals, credit calculations, and lifecycle transitions
+- Customer management with account summaries and order timelines
+- Product catalog with categories, units, pricing, and stock quantities
+- Sales-order management, including order items, discounts, totals, and lifecycle
+  transitions
+- Customer credit calculations and invoice preview with browser printing
 - Search, filtering, sorting, and pagination on list views
-- Customer account summaries and order timelines
 - Notifications with unread counts, read-state actions, and entity navigation
 - Supabase authentication, session protection, sign-in, and sign-out
 - Role-based permissions for Admin, Sales, Operations, and Accounting users
-- Invoice preview and browser printing
 - Reusable Vue components for forms, buttons, modals, inputs, selects, badges,
   alerts, empty states, and loading skeletons
 - MSW browser mocks for local development
+
+The Mini ERP is under active development; see the roadmap for completed
+functionality, current gaps, and planned modules.
 
 ## Tech Stack
 
@@ -130,4 +134,5 @@ src/
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for completed functionality, current gaps, and planned
-operations, reporting, inventory, governance, and integration work.
+operations, reporting, invoicing and payments, inventory, governance, and
+integration work.
