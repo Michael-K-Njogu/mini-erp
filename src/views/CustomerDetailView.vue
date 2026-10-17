@@ -234,7 +234,52 @@ function setTabButton(element, index) {
   </PageToolbar>
 
   <main class="customer-detail-page">
-    <BaseSkeleton v-if="loading" width="100%" height="20rem" />
+    <div
+      v-if="loading"
+      class="customer-workspace customer-workspace-skeleton"
+      role="status"
+      aria-label="Loading customer details"
+    >
+      <section class="customer-profile-skeleton" aria-hidden="true">
+        <BaseSkeleton width="72px" height="72px" />
+        <BaseSkeleton width="70%" height="1.25rem" />
+        <BaseSkeleton width="46%" height="1rem" />
+        <div class="customer-profile-skeleton-actions">
+          <BaseSkeleton width="100%" height="2.25rem" />
+          <BaseSkeleton width="100%" height="2.25rem" />
+        </div>
+      </section>
+
+      <div class="customer-main customer-main-skeleton" aria-hidden="true">
+        <div class="customer-tabs-skeleton">
+          <BaseSkeleton width="88px" height="2.75rem" />
+          <BaseSkeleton width="76px" height="2.75rem" />
+          <BaseSkeleton width="132px" height="2.75rem" />
+        </div>
+
+        <div class="customer-tab-panel customer-tab-panel-skeleton">
+          <div class="customer-stat-grid">
+            <div v-for="index in 3" :key="`stat-${index}`" class="customer-skeleton-card">
+              <BaseSkeleton width="62%" height="0.875rem" />
+              <BaseSkeleton width="48%" height="1.5rem" />
+              <BaseSkeleton width="78%" height="0.75rem" />
+            </div>
+          </div>
+
+          <div class="customer-overview-grid">
+            <div v-for="index in 2" :key="`info-${index}`" class="customer-information-card">
+              <div class="customer-information-header">
+                <BaseSkeleton width="58%" height="1.125rem" />
+                <BaseSkeleton width="82%" height="0.875rem" />
+              </div>
+              <div class="customer-information-grid-skeleton">
+                <BaseSkeleton v-for="row in 4" :key="`row-${index}-${row}`" height="2.25rem" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <Alert v-else-if="error" type="danger" :message="error">
       <template #icon>
@@ -603,12 +648,82 @@ function setTabButton(element, index) {
   min-width: 0;
 }
 
+.customer-profile-skeleton {
+  align-items: center;
+  background: var(--bg-colour-white);
+  border: 1px solid var(--border-colour-subtle);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px 20px;
+}
+
+.customer-profile-skeleton > :first-child {
+  border-radius: 50%;
+  margin-bottom: 4px;
+}
+
+.customer-profile-skeleton-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+  width: 100%;
+}
+
 .customer-main {
   display: flex;
   flex-direction: column;
   gap: 20px;
   min-width: 0;
   width: 100%;
+}
+
+.customer-main-skeleton {
+  gap: 20px;
+}
+
+.customer-tabs-skeleton {
+  align-items: center;
+  border-bottom: 1px solid var(--border-colour-default);
+  display: flex;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.customer-tabs-skeleton > :first-child {
+  border-bottom: 2px solid var(--border-info);
+  border-radius: 0;
+}
+
+.customer-tab-panel-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.customer-skeleton-card {
+  align-items: flex-start;
+  background: var(--bg-colour-white);
+  border: 1px solid var(--border-colour-subtle);
+  border-radius: var(--border-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+}
+
+.customer-information-grid-skeleton {
+  display: grid;
+  gap: 8px 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 12px;
+}
+
+.customer-information-grid-skeleton :deep(.skeleton) {
+  align-self: center;
 }
 
 .customer-tabs {
@@ -990,6 +1105,27 @@ function setTabButton(element, index) {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .customer-profile-skeleton {
+    align-items: center;
+    flex-direction: row;
+    padding: 18px;
+  }
+
+  .customer-profile-skeleton > :first-child {
+    flex: 0 0 72px;
+    margin: 0;
+  }
+
+  .customer-profile-skeleton-actions {
+    display: flex;
+    margin: 0 0 0 auto;
+    width: auto;
+  }
+
+  .customer-profile-skeleton-actions :deep(.skeleton) {
+    width: 76px !important;
+  }
+
   .customer-overview-grid {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1007,6 +1143,22 @@ function setTabButton(element, index) {
 }
 
 @media (max-width: 520px) {
+  .customer-profile-skeleton {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .customer-profile-skeleton-actions {
+    border-top: 1px solid var(--border-colour-subtle);
+    flex-basis: 100%;
+    justify-content: flex-end;
+    padding-top: 12px;
+  }
+
+  .customer-information-grid-skeleton {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .customer-tab {
     padding: 11px 12px;
   }
