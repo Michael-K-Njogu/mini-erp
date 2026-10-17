@@ -13,6 +13,24 @@ export async function signIn(email, password) {
   return data
 }
 
+export async function signInAnonymously() {
+  const { data, error } = await supabase.auth.signInAnonymously()
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export async function resetDemoData() {
+  const { error } = await supabase.rpc('reset_demo_data')
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
 
