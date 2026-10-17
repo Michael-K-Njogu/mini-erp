@@ -6,6 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 
 import { signIn } from '../services/authService'
+import { useAuth } from '../composables/useAuth'
 import { useToast } from '../composables/useToast'
 
 import BaseTextInput from '../components/base/BaseTextInput.vue'
@@ -16,7 +17,12 @@ const router = useRouter()
 
 const { success, error: showError } = useToast()
 
+const { signInAsDemo } = useAuth()
+
+const demoEnabled = import.meta.env.VITE_ENABLE_DEMO === 'true'
+
 const loading = ref(false)
+const demoLoading = ref(false)
 
 const loginSchema = toTypedSchema(
   z.object({
@@ -62,6 +68,22 @@ const handleLogin = handleSubmit(async (values) => {
     loading.value = false
   }
 })
+
+async function handleDemo() {
+  demoLoading.value = true
+
+  try {
+    await signInAsDemo()
+
+    await router.replace(redirectPath.value)
+  } catch (err) {
+    console.error('Demo sign-in failed:', err)
+
+    showError(err.message || 'Unable to start the demo. Please try again.')
+  } finally {
+    demoLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -113,9 +135,22 @@ const handleLogin = handleSubmit(async (values) => {
           type="submit"
           variant="primary"
           :loading="loading"
-          :disabled="loading"
+          :disabled="loading || demoLoading"
         />
       </form>
+
+      <div v-if="demoEnabled" class="login-demo">
+        <p>Just exploring? No account needed.</p>
+
+        <BaseButton
+          label="Try the demo"
+          type="button"
+          variant="secondary"
+          :loading="demoLoading"
+          :disabled="loading || demoLoading"
+          @click="handleDemo"
+        />
+      </div>
     </section>
   </main>
 </template>
@@ -154,6 +189,22 @@ const handleLogin = handleSubmit(async (values) => {
 .login-form {
   display: flex;
   flex-direction: column;
+}
+
+.login-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-colour-subtle);
+}
+
+.login-demo p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 .form-group {
