@@ -2,10 +2,13 @@
 import AppSidebar from './AppSidebar.vue'
 import AppHeader from './AppHeader.vue'
 import DemoBanner from '../components/DemoBanner.vue'
+import { useSidebar } from '../composables/useSidebar.js'
+
+const { collapsed } = useSidebar()
 </script>
 
 <template>
-  <div class="app-layout">
+  <div class="app-layout" :class="{ 'app-layout--collapsed': collapsed }">
     <AppSidebar />
 
     <main class="app-main">
