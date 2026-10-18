@@ -16,13 +16,23 @@ defineProps({
     type: String,
     required: true,
   },
+  collapsed: {
+    type: Boolean,
+    default: false,
+  },
 })
 </script>
 
 <template>
-  <RouterLink class="sidebar-nav-item" exact-active-class="active" :to="to">
-    <component :is="icon" :size="iconSize" />
+  <RouterLink
+    class="sidebar-nav-item"
+    exact-active-class="active"
+    :to="to"
+    :data-label="title"
+    :aria-label="collapsed ? title : undefined"
+  >
+    <component :is="icon" :size="iconSize" aria-hidden="true" />
 
-    <span>{{ title }}</span>
+    <span v-show="!collapsed">{{ title }}</span>
   </RouterLink>
 </template>
