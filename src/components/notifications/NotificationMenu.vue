@@ -11,7 +11,6 @@ import { formatDate } from '../../utils/formatters.js'
 
 import BaseButton from '../base/BaseButton.vue'
 
-const emit = defineEmits(['view-all'])
 const router = useRouter()
 const isOpen = ref(false)
 const menuRef = ref(null)
@@ -68,9 +67,9 @@ async function handleMarkAllAsRead() {
   }
 }
 
-function handleViewAll() {
+async function handleViewAll() {
   isOpen.value = false
-  emit('view-all')
+  await router.push({ name: 'notifications' })
 }
 
 function handleClickOutside(event) {
@@ -183,6 +182,7 @@ onBeforeUnmount(async () => {
           label="View all notifications"
           variant="secondary"
           size="sm"
+          type="button"
           @click="handleViewAll"
         />
       </div>
