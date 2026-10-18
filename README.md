@@ -186,6 +186,11 @@ created.
 - Keep API calls in `src/services/` and domain rules in `src/business/` rather
   than embedding them in views.
 - Reuse components from `src/components/base/` before adding a new control.
+- The shared foundations in `src/styles/variables.css` map to the
+  [DDS Design System](https://github.com/DDS-UX-Design/dds-design-system):
+  semantic colours, typography, spacing, radius, and button tokens. The app's
+  Vue controls follow its documented button, form-field, status-badge, and
+  reduced-motion skeleton patterns.
 - Add route permissions in `src/router/index.js` and action checks in the relevant
   feature component when introducing a protected workflow.
 - Run `npm run format:check` before committing formatting-sensitive changes.
