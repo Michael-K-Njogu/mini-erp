@@ -49,7 +49,6 @@ const visibleNavigation = computed(() =>
   <aside class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
     <div class="sidebar-header">
       <div v-show="!collapsed" class="sidebar-brand">
-        <img class="sidebar-logo" src="/favicon.svg" width="24" height="24" alt="" />
         <span>Mikey's Mini-ERP</span>
       </div>
       <button
