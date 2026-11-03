@@ -604,13 +604,32 @@ h1 {
   background: none;
   border: none;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  width: 100%;
+  font: inherit;
+  color: inherit;
   padding: 0;
+  user-select: none;
+}
+
+.sort-button .sort-icon {
+  flex: none;
+  color: var(--color-icon-muted);
+}
+
+.sort-button.is-sorted .sort-icon {
+  color: var(--color-interactive-default);
+}
+
+.sort-button:hover .sort-icon {
+  color: var(--color-icon-default);
+}
+
+.sort-button:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .row {
@@ -906,21 +925,6 @@ select {
 th {
   background-color: var(--color-bg-default);
   font-weight: 600;
-}
-
-.sortable {
-  cursor: pointer;
-  user-select: none;
-}
-
-.sortable .lucide-arrow-up-down-icon {
-  color: var(--color-icon-muted);
-}
-
-.sortable span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .clickable-row {
