@@ -23,15 +23,15 @@ ul {
 }
 
 .card-icon {
-  border: 1px solid var(--border-colour-default);
+  border: 1px solid var(--color-border-default);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: var(--bg-colour-default);
-  color: var(--text-colour-secondary);
+  background-color: var(--color-bg-default);
+  color: var(--color-text-secondary);
 }
 
 .customer-card {
@@ -42,12 +42,12 @@ ul {
 }
 
 .avatar {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 2.5rem;
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background-color: var(--bg-colour-default);
+  background-color: var(--color-bg-default);
   display: flex;
   align-items: center;
   justify-content: center;

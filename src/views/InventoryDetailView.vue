@@ -352,7 +352,7 @@ onMounted(loadPage)
 .inventory-toolbar-context span,
 .stock-overview-heading p,
 .stock-movements-header p {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
   margin: 0;
 }
@@ -365,18 +365,18 @@ onMounted(loadPage)
 }
 
 .adjustment-error {
-  background: var(--bg-danger-muted);
-  border: 1px solid var(--border-danger);
+  background: var(--color-feedback-error-subtle);
+  border: 1px solid var(--color-feedback-error);
   border-radius: var(--border-radius-md);
-  color: var(--text-colour-danger);
+  color: var(--color-feedback-error);
   margin: 0;
   padding: 12px 16px;
 }
 
 .stock-overview,
 .stock-movements {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
 }
 
@@ -407,13 +407,13 @@ onMounted(loadPage)
 }
 
 .stock-attention--low-stock {
-  background: var(--bg-warning-muted);
-  color: var(--text-colour-warning);
+  background: var(--color-feedback-warning-subtle);
+  color: var(--color-feedback-warning);
 }
 
 .stock-attention--out-of-stock {
-  background: var(--bg-danger-muted);
-  color: var(--text-colour-danger);
+  background: var(--color-feedback-error-subtle);
+  color: var(--color-feedback-error);
 }
 
 .inventory-metrics {
@@ -424,8 +424,8 @@ onMounted(loadPage)
 }
 
 .inventory-metric {
-  background: var(--bg-colour-default);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-default);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-md);
   display: flex;
   flex-direction: column;
@@ -434,7 +434,7 @@ onMounted(loadPage)
 }
 
 .inventory-metric dt {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -446,17 +446,17 @@ onMounted(loadPage)
 }
 
 .inventory-metric > span {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 
 .inventory-metric--available {
-  background: var(--bg-info-muted);
-  border-color: var(--border-info);
+  background: var(--color-feedback-info-subtle);
+  border-color: var(--color-feedback-info);
 }
 
 .inventory-metric--available dd {
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   font-size: 28px;
 }
 
@@ -481,15 +481,15 @@ onMounted(loadPage)
 
 .stock-movements-table th,
 .stock-movements-table td {
-  border-top: 1px solid var(--border-colour-subtle);
+  border-top: 1px solid var(--color-border-subtle);
   padding: 12px 16px;
   text-align: left;
   vertical-align: middle;
 }
 
 .stock-movements-table th {
-  background: var(--bg-colour-default);
-  color: var(--text-colour-secondary);
+  background: var(--color-bg-default);
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -515,7 +515,7 @@ onMounted(loadPage)
 }
 
 .stock-movements .state-message {
-  border-top: 1px solid var(--border-colour-subtle);
+  border-top: 1px solid var(--color-border-subtle);
   margin: 0;
   padding: 24px;
 }

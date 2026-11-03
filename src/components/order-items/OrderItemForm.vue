@@ -242,8 +242,8 @@ const productOptions = computed(() =>
 
 .summary-grid {
   border-radius: 4px;
-  background-color: var(--bg-colour-default);
-  border: 1px solid var(--border-colour-default);
+  background-color: var(--color-bg-default);
+  border: 1px solid var(--color-border-default);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
@@ -254,7 +254,7 @@ const productOptions = computed(() =>
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   text-transform: uppercase;
 }
 .summary-info {
@@ -272,7 +272,7 @@ const productOptions = computed(() =>
   justify-content: flex-end;
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--color-interactive-default);
   padding: 16px;
 }
 </style>

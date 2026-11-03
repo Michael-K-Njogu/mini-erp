@@ -116,14 +116,14 @@ onBeforeUnmount(() => {
 
   padding: 2rem;
 
-  background: rgb(0 0 0 / 45%);
+  background: var(--color-bg-scrim);
 
   z-index: 9999;
 }
 
 .modal {
   width: 100%;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-default);
   transition: transform 0.2s ease;
 }
 

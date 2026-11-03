@@ -650,8 +650,8 @@ function setTabButton(element, index) {
 
 .customer-profile-skeleton {
   align-items: center;
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
   display: flex;
   flex-direction: column;
@@ -686,14 +686,14 @@ function setTabButton(element, index) {
 
 .customer-tabs-skeleton {
   align-items: center;
-  border-bottom: 1px solid var(--border-colour-default);
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   gap: 6px;
   overflow: hidden;
 }
 
 .customer-tabs-skeleton > :first-child {
-  border-bottom: 2px solid var(--border-info);
+  border-bottom: 2px solid var(--color-feedback-info);
   border-radius: 0;
 }
 
@@ -705,8 +705,8 @@ function setTabButton(element, index) {
 
 .customer-skeleton-card {
   align-items: flex-start;
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-md);
   display: flex;
   flex-direction: column;
@@ -727,7 +727,7 @@ function setTabButton(element, index) {
 }
 
 .customer-tabs {
-  border-bottom: 1px solid var(--border-colour-default);
+  border-bottom: 1px solid var(--color-border-default);
   display: flex;
   gap: 6px;
   overflow-x: auto;
@@ -738,7 +738,7 @@ function setTabButton(element, index) {
   background: transparent;
   border: 0;
   border-bottom: 2px solid transparent;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
@@ -750,27 +750,27 @@ function setTabButton(element, index) {
 }
 
 .customer-tab:hover {
-  color: var(--text-colour-default);
+  color: var(--color-text-primary);
 }
 
 .customer-tab--active {
-  border-bottom-color: var(--text-colour-accent);
-  color: var(--text-colour-accent);
+  border-bottom-color: var(--color-interactive-default);
+  color: var(--color-interactive-default);
   font-weight: 600;
 }
 
 .customer-tab:focus-visible,
 .customer-order-link:focus-visible {
   border-radius: var(--border-radius-sm);
-  outline: 2px solid var(--border-info);
+  outline: 2px solid var(--color-feedback-info);
   outline-offset: 2px;
 }
 
 .customer-tab-count {
   align-items: center;
-  background: var(--bg-colour-default);
+  background: var(--color-bg-default);
   border-radius: var(--border-radius-full);
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   display: inline-flex;
   font-size: 12px;
   height: 22px;
@@ -799,8 +799,8 @@ function setTabButton(element, index) {
 
 .customer-stat-card,
 .customer-credit-card {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
   display: flex;
   flex-direction: column;
@@ -810,7 +810,7 @@ function setTabButton(element, index) {
 
 .customer-stat-card > span,
 .customer-credit-card > span {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -825,13 +825,13 @@ function setTabButton(element, index) {
 
 .customer-stat-card small,
 .customer-credit-card small {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   line-height: 1.45;
 }
 
 .customer-stat-card .customer-stat-loading {
-  color: var(--text-colour-tertiary);
+  color: var(--color-text-muted);
   font-size: 18px;
 }
 
@@ -843,15 +843,15 @@ function setTabButton(element, index) {
 
 .customer-information-card,
 .credit-usage-card {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
   min-width: 0;
   overflow: hidden;
 }
 
 .customer-information-header {
-  border-bottom: 1px solid var(--border-colour-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
   padding: 18px 20px;
 }
 
@@ -865,7 +865,7 @@ function setTabButton(element, index) {
 .customer-information-header p,
 .customer-section-heading p,
 .credit-usage-heading p {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
   margin: 0;
 }
@@ -878,7 +878,7 @@ function setTabButton(element, index) {
 }
 
 .customer-information-item {
-  border-bottom: 1px solid var(--border-colour-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
   min-width: 0;
   padding: 14px 8px;
 }
@@ -888,7 +888,7 @@ function setTabButton(element, index) {
 }
 
 .customer-information-item dt {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   margin-bottom: 6px;
 }
@@ -903,7 +903,7 @@ function setTabButton(element, index) {
 }
 
 .customer-information-item a {
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   text-decoration: none;
 }
 
@@ -919,8 +919,8 @@ function setTabButton(element, index) {
 }
 
 .customer-orders-table-wrap {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
 }
@@ -933,15 +933,15 @@ function setTabButton(element, index) {
 
 .customer-orders-table th,
 .customer-orders-table td {
-  border-bottom: 1px solid var(--border-colour-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
   padding: 12px 16px;
   text-align: left;
   vertical-align: middle;
 }
 
 .customer-orders-table th {
-  background: var(--bg-colour-default);
-  color: var(--text-colour-secondary);
+  background: var(--color-bg-default);
+  color: var(--color-text-secondary);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -962,7 +962,7 @@ function setTabButton(element, index) {
 .customer-order-link {
   background: transparent;
   border: 0;
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   cursor: pointer;
   font: inherit;
   font-weight: 500;
@@ -970,8 +970,8 @@ function setTabButton(element, index) {
 }
 
 .customer-orders-more {
-  border-top: 1px solid var(--border-colour-subtle);
-  color: var(--text-colour-secondary);
+  border-top: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
   font-size: 13px;
   margin: 0;
   padding: 12px 16px;
@@ -979,19 +979,19 @@ function setTabButton(element, index) {
 
 .customer-tab-state,
 .customer-tab-error {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   margin: 0;
   padding: 24px;
   text-align: center;
 }
 
 .customer-tab-error {
-  background: var(--bg-danger-muted);
-  border-color: var(--border-danger);
-  color: var(--text-colour-danger);
+  background: var(--color-feedback-error-subtle);
+  border-color: var(--color-feedback-error);
+  color: var(--color-feedback-error);
 }
 
 .customer-tab-error button {
@@ -1010,14 +1010,14 @@ function setTabButton(element, index) {
 }
 
 .customer-credit-card:first-child {
-  background: var(--bg-info-muted);
-  border-color: var(--border-info);
+  background: var(--color-feedback-info-subtle);
+  border-color: var(--color-feedback-info);
 }
 
 .customer-credit-card--over-limit {
-  background: var(--bg-danger-muted);
-  border-color: var(--border-danger);
-  color: var(--text-colour-danger);
+  background: var(--color-feedback-error-subtle);
+  border-color: var(--color-feedback-error);
+  color: var(--color-feedback-error);
 }
 
 .credit-usage-card {
@@ -1038,13 +1038,13 @@ function setTabButton(element, index) {
 }
 
 .credit-usage-heading > strong {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
   text-align: right;
 }
 
 .credit-usage-track {
-  background: var(--bg-colour-default);
+  background: var(--color-bg-default);
   border-radius: var(--border-radius-full);
   height: 10px;
   margin-top: 18px;
@@ -1052,7 +1052,7 @@ function setTabButton(element, index) {
 }
 
 .credit-usage-track span {
-  background: var(--text-colour-accent);
+  background: var(--color-interactive-default);
   border-radius: inherit;
   display: block;
   height: 100%;
@@ -1060,23 +1060,23 @@ function setTabButton(element, index) {
 }
 
 .credit-usage-card--over-limit .credit-usage-track span {
-  background: var(--text-colour-danger);
+  background: var(--color-feedback-error);
 }
 
 .credit-usage-footnote {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   line-height: 1.5;
   margin: 12px 0 0;
 }
 
 .customer-credit-note {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
 .customer-credit-note strong {
-  color: var(--text-colour-default);
+  color: var(--color-text-primary);
   margin-left: 4px;
 }
 
@@ -1091,10 +1091,10 @@ function setTabButton(element, index) {
 }
 
 .customer-not-found {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   margin: 0;
   padding: 24px;
   text-align: center;
@@ -1149,7 +1149,7 @@ function setTabButton(element, index) {
   }
 
   .customer-profile-skeleton-actions {
-    border-top: 1px solid var(--border-colour-subtle);
+    border-top: 1px solid var(--color-border-subtle);
     flex-basis: 100%;
     justify-content: flex-end;
     padding-top: 12px;

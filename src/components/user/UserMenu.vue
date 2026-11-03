@@ -171,7 +171,7 @@ onBeforeUnmount(() => {
 }
 
 .user-menu-trigger:hover {
-  background: var(--surface-hover);
+  background: var(--color-bg-subtle);
 }
 
 .user-avatar,
@@ -187,8 +187,8 @@ onBeforeUnmount(() => {
 
   border-radius: 50%;
 
-  background: var(--btn-primary-bg);
-  color: var(--text-colour-inverse);
+  background: var(--color-interactive-default);
+  color: var(--color-text-on-interactive);
 
   font-size: 14px;
   font-weight: 600;
@@ -219,7 +219,7 @@ onBeforeUnmount(() => {
 
   overflow: hidden;
 
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -255,7 +255,7 @@ onBeforeUnmount(() => {
 
   margin-top: 0.125rem;
 
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
 
   text-overflow: ellipsis;
@@ -267,7 +267,7 @@ onBeforeUnmount(() => {
 
   margin: 0.5rem 0;
 
-  background: var(--border-color);
+  background: var(--color-border-default);
 }
 
 .user-menu-item {
@@ -283,7 +283,7 @@ onBeforeUnmount(() => {
   border-radius: var(--border-radius-sm);
 
   background: transparent;
-  color: var(--text-primary);
+  color: var(--color-text-primary);
 
   font: inherit;
   font-size: 0.875rem;
@@ -293,7 +293,7 @@ onBeforeUnmount(() => {
 }
 
 .user-menu-item:hover:not(:disabled) {
-  background: var(--surface-hover);
+  background: var(--color-bg-subtle);
 }
 
 .user-menu-item:disabled {
@@ -302,6 +302,6 @@ onBeforeUnmount(() => {
 }
 
 .user-menu-item-danger {
-  color: var(--text-colour-danger);
+  color: var(--color-feedback-error);
 }
 </style>

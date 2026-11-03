@@ -59,8 +59,8 @@ function customerTypeLabel(type) {
 <style scoped>
 .customer-profile-card {
   align-items: center;
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
   display: flex;
   flex-direction: column;
@@ -72,10 +72,10 @@ function customerTypeLabel(type) {
 
 .customer-avatar {
   align-items: center;
-  background: var(--bg-info-muted);
-  border: 1px solid var(--border-info);
+  background: var(--color-feedback-info-subtle);
+  border: 1px solid var(--color-feedback-info);
   border-radius: 50%;
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   display: flex;
   flex: 0 0 72px;
   font-size: 24px;
@@ -113,7 +113,7 @@ function customerTypeLabel(type) {
 }
 
 .customer-profile-meta {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   display: flex;
   flex-direction: column;
   font-size: 13px;
@@ -122,14 +122,14 @@ function customerTypeLabel(type) {
 }
 
 .customer-profile-meta span {
-  background: var(--bg-colour-default);
+  background: var(--color-bg-default);
   border-radius: var(--border-radius-full);
   padding: 4px 9px;
 }
 
 .customer-profile-meta .customer-number {
-  background: var(--bg-info-muted);
-  color: var(--text-colour-accent);
+  background: var(--color-feedback-info-subtle);
+  color: var(--color-interactive-default);
   font-weight: 600;
 }
 
@@ -143,9 +143,9 @@ function customerTypeLabel(type) {
 
 .customer-profile-links a {
   align-items: center;
-  border: 1px solid var(--border-colour-default);
+  border: 1px solid var(--color-border-default);
   border-radius: var(--border-radius-md);
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   display: flex;
   font-size: 13px;
   gap: 7px;
@@ -156,7 +156,7 @@ function customerTypeLabel(type) {
 }
 
 .customer-profile-links a:hover {
-  background: var(--bg-info-muted);
+  background: var(--color-feedback-info-subtle);
 }
 
 @media (max-width: 700px) {
@@ -203,7 +203,7 @@ function customerTypeLabel(type) {
   }
 
   .customer-profile-links {
-    border-top: 1px solid var(--border-colour-subtle);
+    border-top: 1px solid var(--color-border-subtle);
     flex-basis: 100%;
     flex-direction: row;
     padding-top: 14px;

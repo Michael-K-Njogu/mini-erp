@@ -261,31 +261,31 @@ onBeforeUnmount(() => {
   width: 100%;
   min-height: 42px;
   padding: 12px;
-  border: 1px solid var(--border-colour-default);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: var(--bg-colour-white);
+  background: var(--color-bg-elevated);
   text-align: left;
   cursor: pointer;
 }
 
 .base-searchable-select-trigger:focus-visible {
   outline: none;
-  border-color: var(--border-info);
+  border-color: var(--color-interactive-default);
   box-shadow: var(--shadow-default);
 }
 
 .base-searchable-select.is-open .base-searchable-select-trigger {
-  border-color: var(--border-info);
+  border-color: var(--color-feedback-info);
   border-width: 2px;
 }
 
 .base-searchable-select.has-error .base-searchable-select-trigger {
-  border-color: var(--text-colour-danger);
+  border-color: var(--color-feedback-error);
   border-width: 2px;
 }
 
 .placeholder {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 
 .base-searchable-select-dropdown {
@@ -295,16 +295,16 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   overflow: hidden;
-  border: 1px solid var(--border-colour-default);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: var(--bg-colour-white);
+  background: var(--color-bg-elevated);
   box-shadow: var(--shadow-default);
 }
 
 .search-input-wrapper {
   padding: 0.5rem;
-  border-bottom: 1px solid var(--border-colour-default);
-  background: var(--bg-colour-white);
+  border-bottom: 1px solid var(--color-border-default);
+  background: var(--color-bg-elevated);
 }
 
 .search-input-label {
@@ -316,7 +316,7 @@ onBeforeUnmount(() => {
   top: 50%;
   left: 12px;
   transform: translateY(-50%);
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 
 .search-input {
@@ -324,9 +324,9 @@ onBeforeUnmount(() => {
   width: 100%;
   min-height: 40px;
   padding: 8px 8px 8px 36px;
-  border: 1px solid var(--border-colour-default);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: var(--bg-colour-white);
+  background: var(--color-bg-elevated);
 }
 
 .dropdown-icon {
@@ -336,12 +336,12 @@ onBeforeUnmount(() => {
 }
 
 .search-input::placeholder {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: var(--border-info);
+  border-color: var(--color-interactive-default);
   box-shadow: var(--shadow-default);
 }
 
@@ -369,11 +369,11 @@ onBeforeUnmount(() => {
 
 .searchable-option:hover,
 .searchable-option.is-highlighted {
-  background: #f3f4f6;
+  background: var(--color-bg-subtle);
 }
 
 .searchable-option.is-selected {
-  background: var(--bg-info-muted);
+  background: var(--color-feedback-info-subtle);
 }
 
 .option-label {
@@ -383,7 +383,7 @@ onBeforeUnmount(() => {
 
 .option-meta {
   overflow: hidden;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
   line-height: 1rem;
   text-overflow: ellipsis;
@@ -391,25 +391,25 @@ onBeforeUnmount(() => {
 }
 
 .searchable-option.is-selected .option-label {
-  color: var(--text-colour-info);
+  color: var(--color-feedback-info);
 }
 
 .clear-option {
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-  color: var(--text-colour-secondary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
   font-size: 0.8125rem;
 }
 
 .empty-option {
   padding: 1rem 0.75rem;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
 .base-searchable-select-error {
   margin: 0.375rem 0 0;
-  color: var(--text-colour-danger);
+  color: var(--color-feedback-error);
   font-size: 0.8125rem;
 }
 </style>

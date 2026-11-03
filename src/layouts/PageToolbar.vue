@@ -24,8 +24,8 @@
   justify-content: space-between;
   gap: 8px;
   padding: 12px 24px;
-  background-color: var(--bg-colour-white);
-  border-bottom: 1px solid var(--border-colour-default);
+  background-color: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .page-toolbar-filters,

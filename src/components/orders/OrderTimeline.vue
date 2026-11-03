@@ -161,7 +161,7 @@ const lastUpdatedActor = computed(() =>
 }
 
 .order-timeline-header {
-  border-bottom: 1px solid var(--border-colour-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
   margin: 0;
   padding: 18px 20px 14px;
 }
@@ -173,13 +173,13 @@ const lastUpdatedActor = computed(() =>
 }
 
 .order-timeline-header p {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   margin: 4px 0 0;
 }
 
 .order-timeline-updated {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   display: block;
   font-size: 11px;
   line-height: 1.4;
@@ -187,7 +187,7 @@ const lastUpdatedActor = computed(() =>
 }
 
 .order-timeline-updated strong {
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
@@ -208,46 +208,46 @@ const lastUpdatedActor = computed(() =>
 }
 
 .timeline-marker--primary.is-completed {
-  background: var(--bg-info-muted);
-  border-color: var(--border-info);
-  color: var(--text-colour-accent);
+  background: var(--color-feedback-info-subtle);
+  border-color: var(--color-feedback-info);
+  color: var(--color-interactive-default);
 }
 
 .timeline-marker--info.is-completed {
-  background: var(--bg-info-muted);
-  border-color: var(--border-info);
-  color: var(--text-colour-info);
+  background: var(--color-feedback-info-subtle);
+  border-color: var(--color-feedback-info);
+  color: var(--color-feedback-info);
 }
 
 .timeline-marker--warning.is-completed {
-  background: var(--bg-warning-muted);
-  border-color: var(--border-warning);
-  color: var(--text-colour-warning);
+  background: var(--color-feedback-warning-subtle);
+  border-color: var(--color-feedback-warning);
+  color: var(--color-feedback-warning);
 }
 
 .timeline-marker--success.is-completed {
-  background: var(--bg-success-muted);
-  border-color: var(--border-success);
-  color: var(--text-colour-success);
+  background: var(--color-feedback-success-subtle);
+  border-color: var(--color-feedback-success);
+  color: var(--color-feedback-success);
 }
 
 .timeline-marker--danger.is-completed {
-  background: var(--bg-danger-muted);
-  border-color: var(--border-danger);
-  color: var(--text-colour-danger);
+  background: var(--color-feedback-error-subtle);
+  border-color: var(--color-feedback-error);
+  color: var(--color-feedback-error);
 }
 
 .timeline-item.is-current .timeline-marker {
-  box-shadow: 0 0 0 3px var(--bg-info-muted);
+  box-shadow: 0 0 0 3px var(--color-feedback-info-subtle);
 }
 
 .timeline-item.is-upcoming .timeline-marker {
-  background: var(--bg-colour-default);
+  background: var(--color-bg-default);
 }
 
 .timeline-current-label {
-  background: var(--bg-info-muted);
-  color: var(--text-colour-accent);
+  background: var(--color-feedback-info-subtle);
+  color: var(--color-interactive-default);
   flex-shrink: 0;
 }
 
@@ -257,14 +257,14 @@ const lastUpdatedActor = computed(() =>
 }
 
 .timeline-actor {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 11px;
   margin: 4px 0 0;
   overflow-wrap: anywhere;
 }
 
 .timeline-pending {
-  color: var(--text-colour-tertiary);
+  color: var(--color-text-muted);
   font-size: 12px;
   margin: 4px 0 0;
 }

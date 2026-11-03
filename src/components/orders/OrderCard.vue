@@ -99,7 +99,7 @@ defineProps({
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-colour);
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 .order-card-eyebrow {
@@ -108,7 +108,7 @@ defineProps({
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 
 .order-card-header .card-title {
@@ -124,7 +124,7 @@ defineProps({
 
 .order-meta-icon {
   flex-shrink: 0;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 
 .order-meta-item > div {
@@ -136,17 +136,17 @@ defineProps({
 .order-meta-label,
 .order-summary-stat span {
   font-size: 0.8125rem;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 
 .order-meta-value {
   font-size: 0.9375rem;
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
 }
 
 .order-meta-divider {
   width: 1px;
-  background: var(--border-colour);
+  background: var(--color-border-default);
 }
 
 .order-summary-grid {
@@ -156,7 +156,7 @@ defineProps({
 }
 
 .order-summary-stat + .order-summary-stat {
-  border-left: 1px solid var(--border-colour);
+  border-left: 1px solid var(--color-border-default);
 }
 
 .order-summary-stat strong {
@@ -164,10 +164,10 @@ defineProps({
 }
 
 .order-grand-total {
-  background-color: var(--bg-info-muted);
-  border: 1px solid var(--border-info);
+  background-color: var(--color-feedback-info-subtle);
+  border: 1px solid var(--color-feedback-info);
   border-radius: 4px;
-  color: var(--text-colour-info);
+  color: var(--color-feedback-info);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,7 +181,7 @@ defineProps({
 
 .order-grand-total strong {
   font-size: 1.5rem;
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
 }
 
 @media (max-width: 640px) {
@@ -199,7 +199,7 @@ defineProps({
   }
 
   .order-summary-stat + .order-summary-stat {
-    border-top: 1px solid var(--border-colour);
+    border-top: 1px solid var(--color-border-default);
     border-left: none;
   }
 }

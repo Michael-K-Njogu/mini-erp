@@ -1,0 +1,163 @@
+/*
+ * DDS semantic colour tokens. Values mirror the design system in Storybook
+ * (Foundations/Semantic Tokens). Components must use these tokens only; never
+ * raw palette values or hex codes. The theme is selected with
+ * <html data-theme="light|dark"> (see composables/useTheme.js).
+ */
+
+:root,
+[data-theme='light'],
+[data-theme='dark'] {
+  /* Tokens that do not change between themes */
+  --color-bg-overlay: #101114;
+  --color-bg-overlay-light: rgb(255 255 255 / 60%);
+  --color-bg-scrim: rgb(0 0 0 / 60%);
+  --color-bg-transparent: rgb(255 255 255 / 0%);
+  --color-brand-dds: #328c98;
+  --color-brand-dds-mark: #32929c;
+  --color-brand-dds-secondary: #4f8995;
+  --color-brand-ink: #111d3e;
+  --color-brand-savannah: #e5a000;
+  --color-brand-white: #ffffff;
+  --color-effect-shadow: rgb(0 0 0 / 8%);
+  --color-effect-shadow-opacity-8: rgb(0 0 0 / 8%);
+  --color-effect-text-shadow: rgb(0 0 0 / 65%);
+  --color-icon-on-brand: #ffffff;
+  --color-interactive-on-brand: #b3c9eb;
+  --color-text-on-brand: #ffffff;
+}
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg-brand: #1a223b;
+  --color-bg-default: #f7f7f7;
+  --color-bg-elevated: #ffffff;
+  --color-bg-elevated-opacity-0: rgb(255 255 255 / 0%);
+  --color-bg-elevated-opacity-10: rgb(255 255 255 / 10%);
+  --color-bg-inverse: #171717;
+  --color-bg-inverse-opacity-0: rgb(23 23 23 / 0%);
+  --color-bg-inverse-opacity-10: rgb(23 23 23 / 10%);
+  --color-bg-inverse-opacity-8: rgb(23 23 23 / 8%);
+  --color-bg-subtle: #e5e5e5;
+  --color-border-default: #d4d4d4;
+  --color-border-focus: rgb(47 94 175 / 50%);
+  --color-border-focus-danger: rgb(185 28 28 / 50%);
+  --color-border-strong: #737373;
+  --color-border-subtle: #e5e5e5;
+  --color-chart-axis: #737373;
+  --color-chart-categorical-01: #2f5eaf;
+  --color-chart-categorical-02: #328c98;
+  --color-chart-categorical-03: #bf6a02;
+  --color-chart-categorical-04: #2e7d32;
+  --color-chart-categorical-05: #7c3aed;
+  --color-chart-categorical-06: #be185d;
+  --color-chart-diverging-high: #b3c9eb;
+  --color-chart-diverging-high-strong: #224583;
+  --color-chart-diverging-low: #fdba74;
+  --color-chart-diverging-low-strong: #9a4100;
+  --color-chart-diverging-midpoint: #e5e5e5;
+  --color-chart-grid: #e5e5e5;
+  --color-chart-label: #404040;
+  --color-chart-reference: #525252;
+  --color-chart-sequential-01: #f0f4fa;
+  --color-chart-sequential-02: #d9e4f5;
+  --color-chart-sequential-03: #82a6dd;
+  --color-chart-sequential-04: #2f5eaf;
+  --color-chart-sequential-05: #224583;
+  --color-chart-status-negative: #b91c1c;
+  --color-chart-status-positive: #2e7d32;
+  --color-chart-status-warning: #975102;
+  --color-chart-track: #e5e5e5;
+  --color-feedback-error: #b91c1c;
+  --color-feedback-error-subtle: #fef2f2;
+  --color-feedback-info: #224583;
+  --color-feedback-info-subtle: #f0f4fa;
+  --color-feedback-success: #2e7d32;
+  --color-feedback-success-subtle: #e8f5e9;
+  --color-feedback-warning: #975102;
+  --color-feedback-warning-subtle: #fffbeb;
+  --color-icon-default: #404040;
+  --color-icon-inverse: #ffffff;
+  --color-icon-muted: #525252;
+  --color-interactive-danger-hover: #991b1b;
+  --color-interactive-default: #2f5eaf;
+  --color-interactive-default-opacity-10: rgb(47 94 175 / 10%);
+  --color-interactive-hover: #224583;
+  --color-interactive-pressed: #1a223b;
+  --color-text-disabled: #a3a3a3;
+  --color-text-inverse: #ffffff;
+  --color-text-muted: #525252;
+  --color-text-on-feedback: #ffffff;
+  --color-text-on-interactive: #ffffff;
+  --color-text-primary: #171717;
+  --color-text-secondary: #404040;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg-brand: #0b0e1b;
+  --color-bg-default: #101114;
+  --color-bg-elevated: #262626;
+  --color-bg-elevated-opacity-0: rgb(38 38 38 / 0%);
+  --color-bg-elevated-opacity-10: rgb(38 38 38 / 10%);
+  --color-bg-inverse: #f7f7f7;
+  --color-bg-inverse-opacity-0: rgb(247 247 247 / 0%);
+  --color-bg-inverse-opacity-10: rgb(247 247 247 / 10%);
+  --color-bg-inverse-opacity-8: rgb(247 247 247 / 8%);
+  --color-bg-subtle: #171717;
+  --color-border-default: #404040;
+  --color-border-focus: rgb(130 166 221 / 50%);
+  --color-border-focus-danger: rgb(254 202 202 / 50%);
+  --color-border-strong: #a3a3a3;
+  --color-border-subtle: #262626;
+  --color-chart-axis: #a3a3a3;
+  --color-chart-categorical-01: #82a6dd;
+  --color-chart-categorical-02: #6ec3ce;
+  --color-chart-categorical-03: #ffe8a3;
+  --color-chart-categorical-04: #a5d6a7;
+  --color-chart-categorical-05: #c4b5fd;
+  --color-chart-categorical-06: #f9a8d4;
+  --color-chart-diverging-high: #2f5eaf;
+  --color-chart-diverging-high-strong: #b3c9eb;
+  --color-chart-diverging-low: #c65d08;
+  --color-chart-diverging-low-strong: #fdba74;
+  --color-chart-diverging-midpoint: #525252;
+  --color-chart-grid: #404040;
+  --color-chart-label: #e5e5e5;
+  --color-chart-reference: #d4d4d4;
+  --color-chart-sequential-01: #1a223b;
+  --color-chart-sequential-02: #224583;
+  --color-chart-sequential-03: #2f5eaf;
+  --color-chart-sequential-04: #82a6dd;
+  --color-chart-sequential-05: #d9e4f5;
+  --color-chart-status-negative: #fecaca;
+  --color-chart-status-positive: #a5d6a7;
+  --color-chart-status-warning: #ffe8a3;
+  --color-chart-track: #404040;
+  --color-feedback-error: #fecaca;
+  --color-feedback-error-subtle: #60353a;
+  --color-feedback-info: #b3c9eb;
+  --color-feedback-info-subtle: #2b466a;
+  --color-feedback-success: #a5d6a7;
+  --color-feedback-success-subtle: #254b30;
+  --color-feedback-warning: #ffe8a3;
+  --color-feedback-warning-subtle: #594318;
+  --color-icon-default: #e5e5e5;
+  --color-icon-inverse: #171717;
+  --color-icon-muted: #a3a3a3;
+  --color-interactive-danger-hover: #fee2e2;
+  --color-interactive-default: #82a6dd;
+  --color-interactive-default-opacity-10: rgb(130 166 221 / 10%);
+  --color-interactive-hover: #b3c9eb;
+  --color-interactive-pressed: #d9e4f5;
+  --color-text-disabled: #737373;
+  --color-text-inverse: #171717;
+  --color-text-muted: #a3a3a3;
+  --color-text-on-feedback: #171717;
+  --color-text-on-interactive: #0b0e1b;
+  --color-text-primary: #f7f7f7;
+  --color-text-secondary: #d4d4d4;
+}

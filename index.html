@@ -10,6 +10,19 @@
       rel="stylesheet"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Set the theme before first paint to avoid a flash of the wrong theme.
+      // Keep in sync with composables/useTheme.js.
+      ;(function () {
+        var stored = null
+        try {
+          stored = localStorage.getItem('theme')
+        } catch (e) {}
+        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        var theme = stored === 'light' || stored === 'dark' ? stored : dark ? 'dark' : 'light'
+        document.documentElement.setAttribute('data-theme', theme)
+      })()
+    </script>
     <title>Mini-ERP</title>
   </head>
   <body>

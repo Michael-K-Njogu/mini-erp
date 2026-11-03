@@ -143,10 +143,10 @@ const emit = defineEmits(['edit', 'delete'])
 
 .order-item-image-placeholder {
   align-items: center;
-  background: linear-gradient(145deg, var(--bg-info-muted), var(--bg-colour-default));
-  border: 1px solid var(--border-colour-subtle);
+  background: linear-gradient(145deg, var(--color-feedback-info-subtle), var(--color-bg-default));
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-md);
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   display: flex;
   flex: 0 0 48px;
   height: 48px;
@@ -163,7 +163,7 @@ const emit = defineEmits(['edit', 'delete'])
 }
 
 .order-item-product-details .product-sku {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   margin-top: 3px;
 }

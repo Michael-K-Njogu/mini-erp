@@ -167,9 +167,9 @@ async function handleDemo() {
   width: 100%;
   max-width: 26rem;
   padding: 2rem;
-  border: 1px solid var(--border-color-default);
+  border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background: var(--bg-colour-white);
+  background: var(--color-bg-elevated);
   box-shadow: var(--shadow-default);
 }
 
@@ -183,7 +183,7 @@ async function handleDemo() {
 
 .login-header p {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
 }
 
 .login-form {
@@ -197,13 +197,13 @@ async function handleDemo() {
   gap: 0.75rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--border-colour-subtle);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .login-demo p {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
@@ -216,6 +216,6 @@ async function handleDemo() {
 .invalid {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--text-colour-danger);
+  color: var(--color-feedback-error);
 }
 </style>

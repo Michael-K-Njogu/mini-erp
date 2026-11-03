@@ -80,9 +80,9 @@ async function handleExit() {
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
   padding: 0.5rem 1.5rem;
-  border-bottom: 1px solid var(--border-colour-subtle);
-  background: var(--bg-warning-muted);
-  color: var(--text-colour-warning);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-feedback-warning-subtle);
+  color: var(--color-feedback-warning);
   font-size: 0.875rem;
 }
 

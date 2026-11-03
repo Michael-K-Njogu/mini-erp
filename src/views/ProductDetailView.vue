@@ -256,8 +256,8 @@ async function deleteCurrentProduct() {
 
 .product-hero,
 .product-information {
-  background: var(--bg-colour-white);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-lg);
 }
 
@@ -271,9 +271,13 @@ async function deleteCurrentProduct() {
 .product-image-placeholder {
   align-items: center;
   background:
-    radial-gradient(ellipse at 50% 42%, rgba(255, 255, 255, 0.92), transparent 52%),
-    linear-gradient(145deg, #f0f4fa, #e6edf7);
-  border: 1px solid var(--border-colour-subtle);
+    radial-gradient(
+      ellipse at 50% 42%,
+      color-mix(in srgb, var(--color-bg-elevated) 92%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(145deg, var(--color-feedback-info-subtle), var(--color-bg-subtle));
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-md);
   display: flex;
   flex-direction: column;
@@ -286,10 +290,10 @@ async function deleteCurrentProduct() {
 
 .placeholder-artwork {
   align-items: center;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(47, 94, 175, 0.14);
+  background: color-mix(in srgb, var(--color-bg-elevated) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-interactive-default) 14%, transparent);
   border-radius: 28px;
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
   display: flex;
   height: 144px;
   justify-content: center;
@@ -310,7 +314,7 @@ async function deleteCurrentProduct() {
 
 .placeholder-caption span,
 .product-information-header p {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
   margin: 0;
 }
@@ -328,9 +332,9 @@ async function deleteCurrentProduct() {
 }
 
 .product-category {
-  background: var(--bg-colour-default);
+  background: var(--color-bg-default);
   border-radius: var(--border-radius-full);
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   padding: 4px 10px;
 }
@@ -345,7 +349,7 @@ async function deleteCurrentProduct() {
 
 .product-sku {
   align-items: center;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   display: flex;
   flex-wrap: wrap;
   font-size: 13px;
@@ -354,15 +358,15 @@ async function deleteCurrentProduct() {
 }
 
 .product-sku code {
-  background: var(--bg-colour-default);
+  background: var(--color-bg-default);
   border-radius: var(--border-radius-xs);
-  color: var(--text-colour-default);
+  color: var(--color-text-primary);
   font-family: var(--font-family-default);
   padding: 3px 6px;
 }
 
 .product-description {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 14px;
   line-height: 1.6;
   margin: 18px 0 24px;
@@ -376,8 +380,8 @@ async function deleteCurrentProduct() {
 }
 
 .product-highlight {
-  background: var(--bg-colour-default);
-  border: 1px solid var(--border-colour-subtle);
+  background: var(--color-bg-default);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--border-radius-md);
   display: flex;
   flex-direction: column;
@@ -386,12 +390,12 @@ async function deleteCurrentProduct() {
 }
 
 .product-highlight--price {
-  background: var(--bg-info-muted);
-  border-color: var(--border-info);
+  background: var(--color-feedback-info-subtle);
+  border-color: var(--color-feedback-info);
 }
 
 .highlight-label {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 13px;
 }
 
@@ -404,11 +408,11 @@ async function deleteCurrentProduct() {
 }
 
 .product-highlight--price strong {
-  color: var(--text-colour-accent);
+  color: var(--color-interactive-default);
 }
 
 .highlight-caption {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
 }
 
@@ -417,7 +421,7 @@ async function deleteCurrentProduct() {
 }
 
 .product-information-header {
-  border-bottom: 1px solid var(--border-colour-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
   padding: 20px 24px;
 }
 
@@ -435,13 +439,13 @@ async function deleteCurrentProduct() {
 }
 
 .product-information-item {
-  border-bottom: 1px solid var(--border-colour-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
   min-width: 0;
   padding: 16px 12px;
 }
 
 .product-information-item dt {
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 12px;
   margin-bottom: 6px;
 }
