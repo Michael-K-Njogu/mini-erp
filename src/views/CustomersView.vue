@@ -103,13 +103,14 @@ const emptyState = computed(() => {
         :class="{ 'is-loading': refreshing }"
         @click="handleRefresh"
         class="btn-icon toolbar-icon-button"
+        size="sm"
       >
         <template #icon>
           <RefreshCw size="20" :class="{ 'is-loading': refreshing }" />
         </template>
       </BaseButton>
 
-      <BaseButton label="Create Customer" @click="router.push({ name: 'customer-new' })">
+      <BaseButton size="sm" label="Create Customer" @click="router.push({ name: 'customer-new' })">
         <template #icon>
           <Plus size="20" />
         </template>

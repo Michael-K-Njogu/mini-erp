@@ -5,6 +5,7 @@ import { useToast } from '../composables/useToast'
 import { useAuth } from '../composables/useAuth'
 
 import NotificationMenu from '../components/notifications/NotificationMenu.vue'
+import ThemeToggle from '../components/theme/ThemeToggle.vue'
 import UserMenu from '../components/user/UserMenu.vue'
 import { ChevronRight } from '@lucide/vue'
 
@@ -101,6 +102,8 @@ async function handleSignOut() {
     </div>
 
     <div class="header-actions">
+      <ThemeToggle />
+
       <NotificationMenu />
 
       <UserMenu @sign-out="handleSignOut" />
@@ -130,7 +133,7 @@ async function handleSignOut() {
   margin: 0;
   font-size: 16px;
   font-weight: 500;
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
 }
 
 .back-button {
@@ -143,13 +146,13 @@ async function handleSignOut() {
   border: 1px solid transparent;
   border-radius: 6px;
   background: transparent;
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
 .back-button:hover {
-  background-color: var(--bg-colour-default);
-  border-color: var(--border-colour-default);
+  background-color: var(--color-bg-default);
+  border-color: var(--color-border-default);
 }
 
 .breadcrumbs {
@@ -161,24 +164,24 @@ async function handleSignOut() {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
   font-size: 16px;
   cursor: pointer;
 }
 
 .breadcrumb-link:hover {
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
   text-decoration: underline;
 }
 
 .breadcrumb-current {
-  color: var(--text-colour-primary);
+  color: var(--color-text-primary);
   font-size: 16px;
   font-weight: 500;
 }
 
 .breadcrumb-separator {
   flex-shrink: 0;
-  color: var(--text-colour-secondary);
+  color: var(--color-text-secondary);
 }
 </style>
