@@ -1,5 +1,6 @@
 <script setup>
 import BaseBadge from '../base/BaseBadge.vue'
+import SortableHeader from '../base/SortableHeader.vue'
 import { getAvailableQuantity, getStockStatus } from '../../services/inventoryService'
 
 defineProps({
@@ -7,9 +8,14 @@ defineProps({
     type: Array,
     required: true,
   },
+
+  sort: {
+    type: Object,
+    required: true,
+  },
 })
 
-const emit = defineEmits(['view'])
+const emit = defineEmits(['view', 'sort'])
 
 function formatQuantity(value) {
   return new Intl.NumberFormat().format(value)
@@ -41,13 +47,33 @@ function getStockStatusVariant(status) {
     <table class="data-table">
       <thead>
         <tr>
-          <th>Product</th>
-          <th>SKU</th>
-          <th>On hand</th>
-          <th>Reserved</th>
-          <th>Available</th>
-          <th>Reorder level</th>
-          <th>Status</th>
+          <SortableHeader label="Product" field="name" :sort="sort" @sort="emit('sort', $event)" />
+          <SortableHeader label="SKU" field="sku" :sort="sort" @sort="emit('sort', $event)" />
+          <SortableHeader
+            label="On hand"
+            field="quantityOnHand"
+            :sort="sort"
+            @sort="emit('sort', $event)"
+          />
+          <SortableHeader
+            label="Reserved"
+            field="quantityReserved"
+            :sort="sort"
+            @sort="emit('sort', $event)"
+          />
+          <SortableHeader
+            label="Available"
+            field="available"
+            :sort="sort"
+            @sort="emit('sort', $event)"
+          />
+          <SortableHeader
+            label="Reorder level"
+            field="reorderLevel"
+            :sort="sort"
+            @sort="emit('sort', $event)"
+          />
+          <SortableHeader label="Status" field="status" :sort="sort" @sort="emit('sort', $event)" />
         </tr>
       </thead>
 

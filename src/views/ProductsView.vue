@@ -89,7 +89,7 @@ function editProduct(id) {
   router.push({ name: 'product-edit', params: { id } })
 }
 
-const { sortBy, isSorted, sortIcon } = useSorting(filters.sort)
+const { sortBy } = useSorting(filters.sort)
 
 function handlePageChange(page) {
   filters.pagination.currentPage = page

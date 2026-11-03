@@ -8,6 +8,7 @@ export function useProductFilters() {
   const filters = reactive({
     query: '',
     category: '',
+    status: '',
     sort: {
       field: 'createdAt',
       direction: 'desc',

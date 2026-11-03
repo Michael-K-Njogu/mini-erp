@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import InventoryTable from '../components/inventory/InventoryTable.vue'
 import InventoryTableSkeleton from '../components/inventory/InventoryTableSkeleton.vue'
 import PageToolbar from '../layouts/PageToolbar.vue'
-import { getInventory, getStockStatus } from '../services/inventoryService'
+import { useSorting } from '../composables/useSorting'
+import { getInventory, getStockStatus, getAvailableQuantity } from '../services/inventoryService'
 
 const router = useRouter()
 const inventory = ref([])
@@ -34,6 +35,36 @@ const filteredInventory = computed(() => {
   }
 
   return items
+})
+
+const sort = reactive({ field: 'name', direction: 'asc' })
+const { sortBy } = useSorting(sort)
+
+const STOCK_STATUS_RANK = { 'out-of-stock': 0, 'low-stock': 1, 'in-stock': 2 }
+
+const SORT_VALUE_GETTERS = {
+  name: (item) => item.product?.name?.toLowerCase() ?? '',
+  sku: (item) => item.product?.sku?.toLowerCase() ?? '',
+  quantityOnHand: (item) => item.quantityOnHand,
+  quantityReserved: (item) => item.quantityReserved,
+  available: (item) => getAvailableQuantity(item),
+  reorderLevel: (item) => item.reorderLevel,
+  status: (item) => STOCK_STATUS_RANK[getStockStatus(item)],
+}
+
+const sortedInventory = computed(() => {
+  const getValue = SORT_VALUE_GETTERS[sort.field]
+  const modifier = sort.direction === 'asc' ? 1 : -1
+
+  return [...filteredInventory.value].sort((a, b) => {
+    const valueA = getValue(a)
+    const valueB = getValue(b)
+
+    if (valueA < valueB) return -1 * modifier
+    if (valueA > valueB) return 1 * modifier
+
+    return 0
+  })
 })
 
 async function loadInventory() {
@@ -96,7 +127,13 @@ onMounted(loadInventory)
         No inventory items found.
       </div>
 
-      <InventoryTable v-else :inventory="filteredInventory" @view="viewInventory" />
+      <InventoryTable
+        v-else
+        :inventory="sortedInventory"
+        :sort="sort"
+        @sort="sortBy"
+        @view="viewInventory"
+      />
     </div>
   </div>
 </template>

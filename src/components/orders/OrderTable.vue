@@ -9,7 +9,8 @@ import {
 } from '../../business/orderPermissions.js'
 import BaseButton from '../base/BaseButton.vue'
 import BaseBadge from '../base/BaseBadge.vue'
-import { Eye, Trash2, ArrowUp, ArrowDown, SquarePen, MessageSquareText, Printer } from '@lucide/vue'
+import SortableHeader from '../base/SortableHeader.vue'
+import { Eye, Trash2, SquarePen, MessageSquareText, Printer } from '@lucide/vue'
 
 defineProps({
   orders: {
@@ -61,56 +62,31 @@ function getOrderStatusVariant(status) {
   <table class="data-table">
     <thead>
       <tr>
-        <th>
-          <button class="sort-button" @click="$emit('sort', 'orderNumber')">
-            Order Number
-            <component
-              v-if="sort.field === 'orderNumber'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              size="14"
-            />
-          </button>
-        </th>
-        <th>
-          <button class="sort-button" @click="$emit('sort', 'customerName')">
-            Customer
-            <component
-              v-if="sort.field === 'customerName'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              size="14"
-            />
-          </button>
-        </th>
-        <th>
-          <button class="sort-button" @click="$emit('sort', 'createdAt')">
-            Date Created
-            <component
-              v-if="sort.field === 'createdAt'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              size="14"
-            />
-          </button>
-        </th>
-        <th>
-          <button class="sort-button" @click="$emit('sort', 'grandTotal')">
-            Grand Total
-            <component
-              v-if="sort.field === 'grandTotal'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              size="14"
-            />
-          </button>
-        </th>
-        <th>
-          <button class="sort-button" @click="$emit('sort', 'status')">
-            Status
-            <component
-              v-if="sort.field === 'status'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              size="14"
-            />
-          </button>
-        </th>
+        <SortableHeader
+          label="Order Number"
+          field="orderNumber"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader
+          label="Customer"
+          field="customerName"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader
+          label="Date Created"
+          field="createdAt"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader
+          label="Grand Total"
+          field="grandTotal"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader label="Status" field="status" :sort="sort" @sort="emit('sort', $event)" />
         <th>Actions</th>
       </tr>
     </thead>

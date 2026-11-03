@@ -15,6 +15,7 @@ import BaseSearchInput from '../components/base/BaseSearchInput.vue'
 import BaseSelect from '../components/base/BaseSelect.vue'
 import BasePagination from '../components/base/BasePagination.vue'
 import BaseButton from '../components/base/BaseButton.vue'
+import SortableHeader from '../components/base/SortableHeader.vue'
 import CustomerTableSkeleton from '../components/customers/CustomerTableSkeleton.vue'
 import BaseEmptyState from '../components/base/BaseEmptyState.vue'
 
@@ -40,7 +41,7 @@ function viewCustomer(id) {
   router.push({ name: 'customer-details', params: { id } })
 }
 
-const { sortBy, isSorted, sortIcon } = useSorting(filters.sort)
+const { sortBy } = useSorting(filters.sort)
 
 function handlePageChange(page) {
   filters.pagination.currentPage = page
@@ -124,37 +125,32 @@ const emptyState = computed(() => {
     <table class="data-table">
       <thead>
         <tr>
-          <th>
-            <button class="sort-button" @click="sortBy('name')">
-              Name
-              <component v-if="isSorted('name')" :is="sortIcon('name')" size="14" />
-            </button>
-          </th>
-          <th>Customer ID</th>
-          <th>
-            <button class="sort-button" @click="sortBy('email')">
-              Email
-              <component v-if="isSorted('email')" :is="sortIcon('email')" size="14" />
-            </button>
-          </th>
-          <th>
-            <button class="sort-button" @click="sortBy('creditLimit')">
-              Credit Limit
-              <component v-if="isSorted('creditLimit')" :is="sortIcon('creditLimit')" size="14" />
-            </button>
-          </th>
-          <th>
-            <button class="sort-button" @click="sortBy('customerType')">
-              Customer Type
-              <component v-if="isSorted('customerType')" :is="sortIcon('customerType')" size="14" />
-            </button>
-          </th>
-          <th>
-            <button class="sort-button" @click="sortBy('createdAt')">
-              Created At
-              <component v-if="isSorted('createdAt')" :is="sortIcon('createdAt')" size="14" />
-            </button>
-          </th>
+          <SortableHeader label="Name" field="name" :sort="filters.sort" @sort="sortBy" />
+          <SortableHeader
+            label="Customer ID"
+            field="customerNumber"
+            :sort="filters.sort"
+            @sort="sortBy"
+          />
+          <SortableHeader label="Email" field="email" :sort="filters.sort" @sort="sortBy" />
+          <SortableHeader
+            label="Credit Limit"
+            field="creditLimit"
+            :sort="filters.sort"
+            @sort="sortBy"
+          />
+          <SortableHeader
+            label="Customer Type"
+            field="customerType"
+            :sort="filters.sort"
+            @sort="sortBy"
+          />
+          <SortableHeader
+            label="Created At"
+            field="createdAt"
+            :sort="filters.sort"
+            @sort="sortBy"
+          />
         </tr>
       </thead>
       <tbody>

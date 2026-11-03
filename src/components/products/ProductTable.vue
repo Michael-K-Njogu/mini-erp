@@ -1,11 +1,12 @@
 <script setup>
 // Utilities
-import { formatCurrency } from '../../utils/formatters'
+import { formatCurrency, formatDate } from '../../utils/formatters'
 import { PRODUCT_STATUS } from '../../constants/productStatuses.js'
 
 import BaseBadge from '../base/BaseBadge.vue'
 import BaseButton from '../base/BaseButton.vue'
-import { Eye, SquarePen, Trash2, ArrowUp, ArrowDown } from '@lucide/vue'
+import SortableHeader from '../base/SortableHeader.vue'
+import { Eye, SquarePen, Trash2 } from '@lucide/vue'
 
 defineProps({
   products: {
@@ -56,66 +57,33 @@ function showProductUnit(product) {
   <table class="data-table">
     <thead>
       <tr>
-        <th class="sortable" @click="$emit('sort', 'sku')">
-          <span>
-            SKU
-            <component
-              v-if="sort.field === 'sku'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              :size="14"
-            />
-          </span>
-        </th>
-        <th class="sortable" @click="$emit('sort', 'name')">
-          <span>
-            Product
-            <component
-              v-if="sort.field === 'name'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              :size="14"
-            />
-          </span>
-        </th>
-        <th class="sortable" @click="$emit('sort', 'category')">
-          <span>
-            Category
-            <component
-              v-if="sort.field === 'category'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              :size="14"
-            />
-          </span>
-        </th>
-        <th class="sortable" @click="$emit('sort', 'sellingPrice')">
-          <span>
-            Selling Price
-            <component
-              v-if="sort.field === 'sellingPrice'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              :size="14"
-            />
-          </span>
-        </th>
-        <th class="sortable" @click="$emit('sort', 'stockQuantity')">
-          <span>
-            Stock Quantity
-            <component
-              v-if="sort.field === 'stockQuantity'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              :size="14"
-            />
-          </span>
-        </th>
-        <th class="sortable" @click="$emit('sort', 'status')">
-          <span>
-            Status
-            <component
-              v-if="sort.field === 'status'"
-              :is="sort.direction === 'asc' ? ArrowUp : ArrowDown"
-              :size="14"
-            />
-          </span>
-        </th>
+        <SortableHeader label="SKU" field="sku" :sort="sort" @sort="emit('sort', $event)" />
+        <SortableHeader label="Product" field="name" :sort="sort" @sort="emit('sort', $event)" />
+        <SortableHeader
+          label="Category"
+          field="category"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader
+          label="Selling Price"
+          field="sellingPrice"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader
+          label="Stock Quantity"
+          field="stockQuantity"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
+        <SortableHeader label="Status" field="status" :sort="sort" @sort="emit('sort', $event)" />
+        <SortableHeader
+          label="Created At"
+          field="createdAt"
+          :sort="sort"
+          @sort="emit('sort', $event)"
+        />
         <th>Actions</th>
       </tr>
     </thead>
@@ -132,6 +100,7 @@ function showProductUnit(product) {
             {{ product.status }}
           </BaseBadge>
         </td>
+        <td>{{ formatDate(product.createdAt) }}</td>
         <td class="row-actions">
           <BaseButton
             :aria-label="`View ${product.name}`"

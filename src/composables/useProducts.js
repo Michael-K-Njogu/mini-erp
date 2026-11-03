@@ -1,8 +1,9 @@
-import { ref, watch, onMounted } from 'vue'
+import { ref, reactive, watch, toRef, computed } from 'vue'
 import { getProducts } from '../services/productService'
+import { useDebounce } from './useDebounce'
 
 export function useProducts(
-  filters = {
+  filters = reactive({
     query: '',
     category: '',
     status: '',
@@ -15,45 +16,68 @@ export function useProducts(
       pageSize: 1000,
       totalItems: 0,
     },
-  },
+  }),
 ) {
   const products = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const abortController = ref(null)
 
-  async function loadProducts() {
+  const debouncedSearchTerm = useDebounce(toRef(filters, 'query'))
+
+  const productQueryOptions = computed(() => ({
+    query: debouncedSearchTerm.value,
+    category: filters.category,
+    status: filters.status,
+    sortField: filters.sort.field,
+    sortDirection: filters.sort.direction,
+    page: filters.pagination.currentPage,
+    pageSize: filters.pagination.pageSize,
+  }))
+
+  async function fetchProducts() {
+    if (abortController.value) {
+      abortController.value.abort()
+    }
+
+    const controller = new AbortController()
+    abortController.value = controller
+
     loading.value = true
     error.value = null
 
     try {
-      const result = await getProducts({
-        query: filters.query,
+      const { data, total } = await getProducts({
+        query: debouncedSearchTerm.value,
         category: filters.category,
         status: filters.status,
         sort: filters.sort,
         page: filters.pagination.currentPage,
         pageSize: filters.pagination.pageSize,
+        signal: controller.signal,
       })
 
-      products.value = result.data
-      filters.pagination.totalItems = result.total
+      products.value = data
+      filters.pagination.totalItems = total
     } catch (err) {
-      error.value = err.message
+      if (err.name !== 'AbortError') {
+        error.value = err.message || 'An error occurred while fetching products.'
+      }
     } finally {
-      loading.value = false
+      if (abortController.value === controller) {
+        loading.value = false
+      }
     }
   }
 
-  async function refresh() {
-    await loadProducts()
-  }
-
-  onMounted(loadProducts)
+  watch(productQueryOptions, fetchProducts, {
+    immediate: true,
+  })
 
   return {
     products,
     loading,
     error,
-    refresh,
+    refresh: fetchProducts,
   }
 }

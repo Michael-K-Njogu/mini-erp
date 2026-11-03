@@ -4,6 +4,7 @@ import { generateCustomerNumber } from '../utils/customerNumber'
 import { uploadCustomerImage, deleteCustomerImage } from './storageService'
 
 const SORT_FIELD_MAP = {
+  customerNumber: 'customer_number',
   name: 'name',
   email: 'email',
   customerType: 'customer_type',

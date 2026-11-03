@@ -8,7 +8,7 @@ const { rows } = defineProps({
   },
 })
 
-const columns = 7
+const columns = 8
 </script>
 
 <template>
