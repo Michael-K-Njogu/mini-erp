@@ -111,7 +111,7 @@ const emptyState = computed(() => {
         </template>
       </BaseButton>
 
-      <BaseButton size="sm" label="Create Customer" @click="router.push({ name: 'customer-new' })">
+      <BaseButton size="md" label="New Customer" @click="router.push({ name: 'customer-new' })">
         <template #icon>
           <Plus size="20" />
         </template>
