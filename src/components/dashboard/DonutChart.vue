@@ -1,58 +1,54 @@
 <script setup>
 import { computed } from 'vue'
+import { Doughnut } from 'vue-chartjs'
+import { useChartColors } from './useChartColors'
+import './chartSetup'
 
 const props = defineProps({
-  // [{ label: string, value: number, colour: string (css colour) }]
   segments: { type: Array, required: true },
 })
 
-const RADIUS = 40
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS
-
-const total = computed(() => props.segments.reduce((sum, s) => sum + s.value, 0))
-
-const arcs = computed(() => {
-  let offset = 0
-
-  return props.segments
-    .filter((segment) => segment.value > 0)
-    .map((segment) => {
-      const length = (segment.value / total.value) * CIRCUMFERENCE
-      const arc = { ...segment, length, offset }
-      offset += length
-      return arc
-    })
-})
-
-const summary = computed(() =>
-  props.segments.map((segment) => `${segment.label}: ${segment.value}`).join(', '),
-)
+const { colors, resolveColor } = useChartColors()
+const total = computed(() => props.segments.reduce((sum, segment) => sum + segment.value, 0))
+const data = computed(() => ({
+  labels: total.value ? props.segments.map((segment) => segment.label) : ['No stock data'],
+  datasets: [
+    {
+      data: total.value ? props.segments.map((segment) => segment.value) : [1],
+      backgroundColor: total.value
+        ? props.segments.map((segment) => resolveColor(segment.colour))
+        : [colors.value?.['--color-chart-track']],
+      borderWidth: 0,
+    },
+  ],
+}))
+const options = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: false,
+  cutout: '72%',
+  plugins: { tooltip: { enabled: total.value > 0 } },
+}))
 </script>
 
 <template>
   <div class="donut">
-    <svg viewBox="0 0 100 100" role="img" :aria-label="summary" class="donut__svg">
-      <circle class="donut__track" cx="50" cy="50" :r="RADIUS" />
-      <circle
-        v-for="arc in arcs"
-        :key="arc.label"
-        cx="50"
-        cy="50"
-        :r="RADIUS"
-        class="donut__arc"
-        :stroke="arc.colour"
-        :stroke-dasharray="`${arc.length} ${CIRCUMFERENCE - arc.length}`"
-        :stroke-dashoffset="-arc.offset"
-        transform="rotate(-90 50 50)"
-      />
-      <text x="50" y="50" class="donut__total" text-anchor="middle" dominant-baseline="central">
-        {{ total }}
-      </text>
-    </svg>
+    <div class="donut__chart" aria-hidden="true">
+      <Doughnut v-if="colors" :data="data" :options="options" />
+      <span class="donut__total">{{ total }}</span>
+    </div>
 
-    <ul class="donut__legend">
-      <li v-for="segment in segments" :key="segment.label">
-        <span class="donut__swatch" :style="{ background: segment.colour }"></span>
+    <ul class="donut__legend" aria-label="Stock health">
+      <li
+        v-for="segment in segments"
+        :key="segment.label"
+        :aria-label="`${segment.label}: ${segment.value}`"
+      >
+        <span
+          class="donut__swatch"
+          :style="{ background: segment.colour }"
+          aria-hidden="true"
+        ></span>
         <span class="donut__legend-label">{{ segment.label }}</span>
         <span class="donut__legend-value">{{ segment.value }}</span>
       </li>
@@ -68,25 +64,20 @@ const summary = computed(() =>
   flex-wrap: wrap;
 }
 
-.donut__svg {
+.donut__chart {
+  position: relative;
   width: 140px;
   height: 140px;
   flex: 0 0 auto;
 }
 
-.donut__track,
-.donut__arc {
-  fill: none;
-  stroke-width: 14;
-}
-
-.donut__track {
-  stroke: var(--color-chart-track);
-}
-
 .donut__total {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
   font: var(--font-weight-semibold) 18px var(--font-family-primary);
-  fill: var(--color-text-primary);
 }
 
 .donut__legend {

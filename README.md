@@ -22,6 +22,8 @@ browser-mocked API development evolve alongside the business features.
   showing who performed each stage
 - Dashboard with a personalised "Welcome Back" greeting
 - Customer credit calculations and invoice preview with browser printing
+- Chart.js dashboard visualizations for sales, open orders, and stock health,
+  with text alternatives and responsive layouts
 - Search, filtering, sorting, and pagination on list views
 - Notifications with unread counts, read-state actions, and entity navigation
 - Supabase authentication, session protection, sign-in, and sign-out
@@ -41,6 +43,7 @@ functionality, current gaps, and planned modules.
 - Vite
 - Vue Router
 - Supabase JavaScript client
+- Chart.js and vue-chartjs
 - Vee-Validate and Zod
 - Mock Service Worker (MSW)
 - Vitest and Vue Test Utils
@@ -139,7 +142,7 @@ npm run test:run      # Run Vitest once
 npm run test:ui       # Open the Vitest UI
 ```
 
-The test suite includes dashboard calculations and responsive navigation tests.
+The test suite includes dashboard calculations, charts, and responsive navigation tests.
 Run `npm run test:run` to execute it once.
 
 The app currently requires a network connection for its business workflows.

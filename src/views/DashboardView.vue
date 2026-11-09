@@ -149,15 +149,21 @@ const stockSegments = computed(() => [
       title="Sales trend"
       :subtitle="`Daily completed sales · ${windowLabel}`"
     >
-      <SalesTrendChart :points="dailySales" />
+      <p v-if="loading" class="dashboard-chart-state" role="status">Loading chart data...</p>
+      <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
+      <SalesTrendChart v-else :points="dailySales" />
     </DashboardSection>
 
     <DashboardSection title="Open orders" subtitle="Pending and processing right now">
-      <HorizontalBarChart :bars="openOrderBars" />
+      <p v-if="loading" class="dashboard-chart-state" role="status">Loading chart data...</p>
+      <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
+      <HorizontalBarChart v-else :bars="openOrderBars" />
     </DashboardSection>
 
     <DashboardSection title="Stock health" subtitle="Available quantity vs reorder level">
-      <DonutChart :segments="stockSegments" />
+      <p v-if="loading" class="dashboard-chart-state" role="status">Loading chart data...</p>
+      <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
+      <DonutChart v-else :segments="stockSegments" />
     </DashboardSection>
   </div>
 </template>
@@ -177,5 +183,11 @@ const stockSegments = computed(() => [
 
 .dashboard-charts__wide {
   grid-column: 1 / -1;
+}
+
+.dashboard-chart-state {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 </style>

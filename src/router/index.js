@@ -5,9 +5,6 @@ import { usePermissions } from '../composables/usePermissions'
 
 import AppLayout from '../layouts/AppLayout.vue'
 
-// Dashboard
-import DashboardView from '../views/DashboardView.vue'
-
 // Customers
 import CustomersView from '../views/CustomersView.vue'
 import NewCustomerView from '../views/NewCustomerView.vue'
@@ -38,7 +35,7 @@ const router = createRouter({
         {
           path: '',
           name: 'dashboard',
-          component: DashboardView,
+          component: () => import('../views/DashboardView.vue'),
           meta: {
             title: 'Dashboard',
           },

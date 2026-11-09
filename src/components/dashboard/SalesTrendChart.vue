@@ -1,128 +1,152 @@
 <script setup>
 import { computed } from 'vue'
+import { Line } from 'vue-chartjs'
+import { color } from 'chart.js/helpers'
 import { formatCurrency } from '../../utils/formatters'
+import { useChartColors } from './useChartColors'
+import './chartSetup'
 
 const props = defineProps({
-  // [{ date: Date, total: number }]
   points: { type: Array, required: true },
 })
 
-const WIDTH = 600
-const HEIGHT = 220
-const PAD = { top: 12, right: 12, bottom: 28, left: 12 }
-
-const max = computed(() => Math.max(...props.points.map((p) => p.total), 1))
-
-const coords = computed(() => {
-  const innerW = WIDTH - PAD.left - PAD.right
-  const innerH = HEIGHT - PAD.top - PAD.bottom
-  const step = props.points.length > 1 ? innerW / (props.points.length - 1) : 0
-
-  return props.points.map((point, index) => ({
-    x: PAD.left + index * step,
-    y: PAD.top + innerH - (point.total / max.value) * innerH,
-    ...point,
-  }))
-})
-
-const linePath = computed(() =>
-  coords.value.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' '),
-)
-
-const areaPath = computed(() => {
-  if (!coords.value.length) return ''
-  const baseline = HEIGHT - PAD.bottom
-  const last = coords.value[coords.value.length - 1]
-  return `${linePath.value} L${last.x.toFixed(1)},${baseline} L${coords.value[0].x.toFixed(1)},${baseline} Z`
-})
-
+const { colors } = useChartColors()
 const dateFormat = new Intl.DateTimeFormat('en-KE', { day: 'numeric', month: 'short' })
-
-const firstLabel = computed(() => dateFormat.format(props.points[0]?.date))
-const lastLabel = computed(() => dateFormat.format(props.points.at(-1)?.date))
-
+const fullDateFormat = new Intl.DateTimeFormat('en-KE', { dateStyle: 'medium' })
+const max = computed(() => Math.max(0, ...props.points.map((point) => point.total)))
+const total = computed(() => props.points.reduce((sum, point) => sum + point.total, 0))
 const summary = computed(() => {
-  const total = props.points.reduce((sum, p) => sum + p.total, 0)
-  return `Daily completed sales from ${firstLabel.value} to ${lastLabel.value}, totalling ${formatCurrency(total)}.`
+  if (!props.points.length) return 'No sales data available.'
+  return `Daily completed sales from ${fullDateFormat.format(props.points[0].date)} to ${fullDateFormat.format(props.points.at(-1).date)}, totalling ${formatCurrency(total.value)}.`
 })
+
+const data = computed(() => {
+  const lineColor = colors.value?.['--color-chart-categorical-01']
+  return {
+    labels: props.points.map((point) => dateFormat.format(point.date)),
+    datasets: [
+      {
+        label: 'Completed sales',
+        data: props.points.map((point) => point.total),
+        borderColor: lineColor,
+        backgroundColor: lineColor ? color(lineColor).alpha(0.12).rgbString() : undefined,
+        fill: true,
+        tension: 0,
+        pointRadius: 2,
+        pointHitRadius: 12,
+        borderWidth: 2,
+      },
+    ],
+  }
+})
+
+const options = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: false,
+  plugins: {
+    tooltip: {
+      callbacks: {
+        title: (items) => fullDateFormat.format(props.points[items[0].dataIndex].date),
+        label: (context) => formatCurrency(context.parsed.y),
+      },
+    },
+  },
+  scales: {
+    x: {
+      ticks: { color: colors.value?.['--color-chart-axis'], maxTicksLimit: 5, maxRotation: 0 },
+      grid: { display: false },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        color: colors.value?.['--color-chart-axis'],
+        maxTicksLimit: 5,
+        callback: (value) => formatCurrency(value),
+      },
+      grid: { color: colors.value?.['--color-chart-grid'] },
+    },
+  },
+}))
 </script>
 
 <template>
   <figure class="line-chart">
-    <svg
-      :viewBox="`0 0 ${WIDTH} ${HEIGHT}`"
-      role="img"
-      :aria-label="summary"
-      preserveAspectRatio="none"
-    >
-      <line
-        class="line-chart__baseline"
-        :x1="PAD.left"
-        :x2="WIDTH - PAD.right"
-        :y1="HEIGHT - PAD.bottom"
-        :y2="HEIGHT - PAD.bottom"
-      />
-      <path class="line-chart__area" :d="areaPath" />
-      <path class="line-chart__line" :d="linePath" />
-      <circle
-        v-for="c in coords"
-        :key="c.date.toISOString()"
-        class="line-chart__point"
-        :cx="c.x"
-        :cy="c.y"
-        r="3"
-      >
-        <title>{{ dateFormat.format(c.date) }}: {{ formatCurrency(c.total) }}</title>
-      </circle>
-    </svg>
+    <p v-if="!points.length" class="chart-empty">No sales data available.</p>
+    <div v-else class="line-chart__canvas">
+      <Line v-if="colors" :data="data" :options="options" aria-hidden="true" />
+    </div>
 
-    <figcaption class="line-chart__axis">
-      <span>{{ firstLabel }}</span>
-      <span>Peak day: {{ formatCurrency(max === 1 ? 0 : max) }}</span>
-      <span>{{ lastLabel }}</span>
+    <figcaption>
+      <p>{{ summary }}</p>
+      <p v-if="points.length">Peak day: {{ formatCurrency(max) }}</p>
     </figcaption>
+    <details v-if="points.length" class="sales-data">
+      <summary>View daily sales data</summary>
+      <div class="sales-data__table">
+        <table class="data-table">
+          <caption>
+            Daily completed sales
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Sales</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="point in points" :key="point.date.toISOString()">
+              <td>{{ fullDateFormat.format(point.date) }}</td>
+              <td>{{ formatCurrency(point.total) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
   </figure>
 </template>
 
 <style scoped>
 .line-chart {
   margin: 0;
+  min-width: 0;
 }
 
-svg {
-  display: block;
-  width: 100%;
+.line-chart__canvas {
+  position: relative;
   height: 220px;
-  overflow: visible;
+  min-width: 0;
 }
 
-.line-chart__baseline {
-  stroke: var(--color-chart-grid);
-  stroke-width: 1;
-}
-
-.line-chart__area {
-  fill: var(--color-chart-categorical-01);
-  opacity: 0.12;
-}
-
-.line-chart__line {
-  fill: none;
-  stroke: var(--color-chart-categorical-01);
-  stroke-width: 2;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.line-chart__point {
-  fill: var(--color-chart-categorical-01);
-}
-
-.line-chart__axis {
+figcaption {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  margin-top: var(--space-1);
-  font-size: var(--font-size-xs);
+  gap: var(--space-1);
   color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+figcaption p {
+  margin: var(--space-2) 0;
+}
+
+.sales-data {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.sales-data summary {
+  cursor: pointer;
+}
+
+.sales-data__table {
+  max-height: 260px;
+  overflow: auto;
+}
+
+caption {
+  text-align: left;
+  padding: var(--space-2) 0;
 }
 </style>
