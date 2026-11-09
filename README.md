@@ -191,9 +191,22 @@ SQL migrations live in `supabase/migrations/`. Apply them to your Supabase proje
   Review existing grants, RLS policies, and triggers before applying it to an
   existing project. It revokes profile update grants for the API roles and
   permits users to update only their own name, phone number, and avatar path.
+- `20261109210000_provision_user_profiles.sql`: provisions a profile with the
+  `Sales` role for newly created non-anonymous Auth users. It leaves existing
+  users untouched, preserves an existing profile, and does not trust role
+  values in user metadata. Review existing `auth.users` triggers first; the
+  migration stops if it finds an unrecognized INSERT trigger. The known demo
+  provisioning trigger remains responsible for demo profiles and seed data.
+  New-user provisioning is part of the Auth insert transaction: a database
+  error creating the profile will prevent the user from being created. Any
+  enabled public sign-up can therefore create a `Sales` profile; configure
+  Supabase Auth sign-up settings accordingly.
 
-Profiles must already exist for authenticated users. Profile photos are readable
-by authenticated users through one-hour signed URLs, and upload/delete access is
+For existing users without profiles, an administrator must insert a profile
+using the Auth user's UUID as `profiles.id` and an explicitly chosen role.
+If a profile exists but is still unavailable, inspect the SELECT grants and RLS
+policies as well. Profile photos are readable by authenticated users through
+one-hour signed URLs, and upload/delete access is
 limited to the owner's folder. JPEG, PNG, and WebP files are limited to 2 MB.
 Anonymous demo accounts can edit their name and phone number but cannot upload
 photos: their automatic database cleanup cannot delete storage objects. Replaced

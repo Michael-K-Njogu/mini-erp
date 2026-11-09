@@ -18,7 +18,7 @@ import BaseTextInput from '../components/base/BaseTextInput.vue'
 import Alert from '../components/Alert.vue'
 
 const router = useRouter()
-const { user, profile, isDemo, updateProfile, reloadProfile } = useAuth()
+const { user, profile, profileError, isDemo, updateProfile, reloadProfile } = useAuth()
 const { success, warning, error: showError } = useToast()
 const values = reactive({ displayName: '', phoneNumber: '' })
 const errors = reactive({ displayName: '', phoneNumber: '', image: '' })
@@ -91,7 +91,7 @@ async function reload() {
     await reloadProfile()
     resetForm()
   } catch (error) {
-    showError(error.message || 'Unable to reload your profile.')
+    showError(profileError.value || 'Unable to reload your profile. Please try again.')
   } finally {
     reloading.value = false
   }
@@ -150,7 +150,11 @@ async function save() {
 
 <template>
   <div class="profile-page">
-    <Alert v-if="!profile" type="danger" message="Your profile is unavailable. Try reloading it." />
+    <Alert
+      v-if="!profile"
+      type="danger"
+      :message="profileError || 'Your profile is unavailable. Try reloading it.'"
+    />
     <form v-else @submit.prevent="save">
       <BaseFormSection title="Personal Information">
         <template #icon><User aria-hidden="true" /></template>

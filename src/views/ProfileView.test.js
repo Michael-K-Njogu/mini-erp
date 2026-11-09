@@ -5,6 +5,7 @@ import ProfileView from './ProfileView.vue'
 
 const user = ref({ id: 'user-1', email: 'user@example.test' })
 const profile = ref(null)
+const profileError = ref(null)
 const isDemo = ref(false)
 const updateProfile = vi.fn()
 const reloadProfile = vi.fn()
@@ -16,7 +17,7 @@ const success = vi.fn()
 
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 vi.mock('../composables/useAuth', () => ({
-  useAuth: () => ({ user, profile, isDemo, updateProfile, reloadProfile }),
+  useAuth: () => ({ user, profile, profileError, isDemo, updateProfile, reloadProfile }),
 }))
 vi.mock('../composables/useToast', () => ({
   useToast: () => ({ error: showError, warning, success }),
@@ -35,6 +36,7 @@ vi.mock('../services/profileService', () => ({
 beforeEach(() => {
   vi.clearAllMocks()
   isDemo.value = false
+  profileError.value = null
   user.value = { id: 'user-1', email: 'user@example.test' }
   profile.value = {
     id: 'user-1',
@@ -53,6 +55,34 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('profile page', () => {
+  it('shows actionable missing-profile errors and allows a successful retry', async () => {
+    profile.value = null
+    profileError.value =
+      'Your profile could not be found or accessed. Contact an administrator to check your account profile.'
+    reloadProfile.mockImplementation(async () => {
+      profile.value = { id: 'user-1', display_name: 'Restored', role: 'Sales' }
+      profileError.value = null
+    })
+    const wrapper = mount(ProfileView)
+    expect(wrapper.text()).toContain('Contact an administrator')
+    await wrapper.find('button').trigger('click')
+    await vi.waitFor(() => expect(wrapper.find('#profile-name').element.value).toBe('Restored'))
+    expect(wrapper.text()).not.toContain('Contact an administrator')
+    wrapper.unmount()
+  })
+
+  it('reports a reload error without exposing a technical database message', async () => {
+    profile.value = null
+    profileError.value =
+      'Unable to load your profile. Try reloading it or contact an administrator.'
+    reloadProfile.mockRejectedValue(new Error('technical database error'))
+    const wrapper = mount(ProfileView)
+    await wrapper.find('button').trigger('click')
+    await vi.waitFor(() => expect(showError).toHaveBeenCalledWith(profileError.value))
+    expect(showError).not.toHaveBeenCalledWith('technical database error')
+    wrapper.unmount()
+  })
+
   it('uses the customer form sections and keeps account details read-only', () => {
     const wrapper = mount(ProfileView)
     const sections = wrapper.findAll('.form-section')

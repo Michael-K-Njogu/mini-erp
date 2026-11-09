@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   deleteProfileImage,
+  getProfileById,
   getProfileImageUrl,
   updateProfile,
   uploadProfileImage,
@@ -33,6 +34,24 @@ beforeEach(() => {
 })
 
 describe('profile service', () => {
+  it('returns a visible profile and reports a missing or inaccessible profile clearly', async () => {
+    mocks.query.maybeSingle.mockResolvedValueOnce({ data: { id: 'user' }, error: null })
+    expect(await getProfileById('user')).toEqual({ id: 'user' })
+    expect(mocks.query.eq).toHaveBeenCalledWith('id', 'user')
+
+    mocks.query.maybeSingle.mockResolvedValueOnce({ data: null, error: null })
+    await expect(getProfileById('user')).rejects.toMatchObject({
+      code: 'PROFILE_UNAVAILABLE',
+      message: expect.stringContaining('Contact an administrator'),
+    })
+  })
+
+  it('preserves actual profile lookup errors', async () => {
+    const error = new Error('Network failed')
+    mocks.query.maybeSingle.mockResolvedValueOnce({ data: null, error })
+    await expect(getProfileById('user')).rejects.toBe(error)
+  })
+
   it('updates only self-service fields with a version condition', async () => {
     mocks.query.maybeSingle.mockResolvedValue({ data: { id: 'user' }, error: null })
     await updateProfile(

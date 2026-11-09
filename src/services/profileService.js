@@ -1,10 +1,18 @@
 import { supabase } from '../api/supabaseClient'
 
 export async function getProfileById(userId) {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
 
   if (error) {
     throw error
+  }
+
+  if (!data) {
+    const missing = new Error(
+      'Your profile could not be found or accessed. Contact an administrator to check your account profile.',
+    )
+    missing.code = 'PROFILE_UNAVAILABLE'
+    throw missing
   }
 
   return data

@@ -13,6 +13,7 @@ import { useToast } from './useToast'
 const user = ref(null)
 const session = ref(null)
 const profile = ref(null)
+const profileError = ref(null)
 const initialized = ref(false)
 
 let authListener = null
@@ -23,15 +24,25 @@ async function loadProfile() {
   const request = ++profileRequest
   if (!user.value?.id) {
     profile.value = null
+    profileError.value = null
     return
   }
 
   const userId = user.value.id
   try {
     const result = await getProfileById(userId)
-    if (user.value?.id === userId && request === profileRequest) profile.value = result
+    if (user.value?.id === userId && request === profileRequest) {
+      profile.value = result
+      profileError.value = null
+    }
   } catch (error) {
-    if (user.value?.id === userId && request === profileRequest) profile.value = null
+    if (user.value?.id === userId && request === profileRequest) {
+      profile.value = null
+      profileError.value =
+        error.code === 'PROFILE_UNAVAILABLE'
+          ? error.message
+          : 'Unable to load your profile. Try reloading it or contact an administrator.'
+    }
     throw error
   }
 }
@@ -45,6 +56,7 @@ async function updateProfile(values, updatedAt) {
   }
   profileRequest += 1
   profile.value = result
+  profileError.value = null
   return result
 }
 
@@ -62,7 +74,7 @@ async function initialize() {
         await loadProfile()
       } catch (error) {
         console.error('Unable to load profile:', error)
-        useToast().error('Unable to load your profile. Open Profile to retry.')
+        useToast().error(profileError.value)
       }
 
       if (!authListener) {
@@ -70,6 +82,7 @@ async function initialize() {
           if (user.value?.id !== newSession?.user?.id) {
             profileRequest += 1
             profile.value = null
+            profileError.value = null
           }
           session.value = newSession
           user.value = newSession?.user ?? null
@@ -83,11 +96,12 @@ async function initialize() {
               } catch (error) {
                 if (user.value?.id !== userId) return
                 console.error('Unable to load profile:', error)
-                useToast().error('Unable to load your profile. Open Profile to retry.')
+                useToast().error(profileError.value)
               }
             }, 0)
           } else {
             profile.value = null
+            profileError.value = null
           }
         })
 
@@ -127,6 +141,7 @@ export function useAuth() {
     user,
     session,
     profile,
+    profileError,
     isAuthenticated,
     isDemo,
     initialized,
