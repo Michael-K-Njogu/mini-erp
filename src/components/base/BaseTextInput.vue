@@ -38,6 +38,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  ariaInvalid: {
+    type: Boolean,
+    default: false,
+  },
+  ariaDescribedby: {
+    type: String,
+    default: undefined,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -63,6 +75,9 @@ function handleInput(event) {
       :placeholder="placeholder"
       :value="modelValue"
       :autocomplete="autocomplete"
+      :disabled="disabled"
+      :aria-invalid="ariaInvalid || undefined"
+      :aria-describedby="ariaDescribedby"
       @input="handleInput"
     />
   </div>

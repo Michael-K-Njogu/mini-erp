@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useDashboard } from '../composables/useDashboard'
 import { formatCurrency } from '../utils/formatters'
+import { getDisplayName } from '../utils/profile'
 import Alert from '../components/Alert.vue'
 import KpiCard from '../components/dashboard/KpiCard.vue'
 import DashboardSection from '../components/dashboard/DashboardSection.vue'
@@ -10,15 +11,11 @@ import SalesTrendChart from '../components/dashboard/SalesTrendChart.vue'
 import DonutChart from '../components/dashboard/DonutChart.vue'
 import HorizontalBarChart from '../components/dashboard/HorizontalBarChart.vue'
 
-const { user } = useAuth()
+const { user, profile } = useAuth()
 const { loading, error, periods, sales, openOrders, dailySales, stockHealth } = useDashboard()
 
 const displayName = computed(() => {
-  const fullName = user.value?.user_metadata?.full_name
-  if (fullName) return fullName
-
-  const emailName = user.value?.email?.split('@')[0]
-  return emailName || 'there'
+  return getDisplayName(profile.value, user.value, 'there')
 })
 
 const windowLabel = computed(() => `Last ${periods.value.days} days`)

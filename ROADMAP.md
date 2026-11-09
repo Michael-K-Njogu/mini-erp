@@ -109,7 +109,7 @@ building-materials business.
 ## Phase 3: Team and Governance
 
 - [x] Basic authentication and session protection
-- [ ] User profile page and profile editing
+- [x] Self-service profile page for display name, phone number, and profile picture
 - [ ] User administration and role assignment
 - [ ] Expand role-based access controls across every module and workflow
 - [ ] Approval workflows for orders and credit limits

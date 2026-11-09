@@ -27,6 +27,8 @@ browser-mocked API development evolve alongside the business features.
 - Search, filtering, sorting, and pagination on list views
 - Notifications with unread counts, read-state actions, and entity navigation
 - Supabase authentication, session protection, sign-in, and sign-out
+- Self-service display name, phone number, and private profile picture editing;
+  email and role remain read-only
 - Role-based permissions for Admin, Sales, Operations, and Accounting users
 - Reusable Vue components for forms, buttons, modals, inputs, selects, badges,
   alerts, empty states, and layout-matched loading skeletons for tables and
@@ -184,6 +186,22 @@ SQL migrations live in `supabase/migrations/`. Apply them to your Supabase proje
 - `add_customer_number`: adds the `customer_number` column to `customers`
 - `add_order_actor_audit`: adds created/updated/stage actor columns and a trigger
   on `orders` that records the acting user
+- `20261109200000_user_profiles.sql`: adds profile fields, self-service access
+  controls, a private profile-image bucket, and profile-based order audit names.
+  Review existing grants, RLS policies, and triggers before applying it to an
+  existing project. It revokes profile update grants for the API roles and
+  permits users to update only their own name, phone number, and avatar path.
+
+Profiles must already exist for authenticated users. Profile photos are readable
+by authenticated users through one-hour signed URLs, and upload/delete access is
+limited to the owner's folder. JPEG, PNG, and WebP files are limited to 2 MB.
+Anonymous demo accounts can edit their name and phone number but cannot upload
+photos: their automatic database cleanup cannot delete storage objects. Replaced
+photos are removed after the profile update; a failed or uncertain upload/update
+can leave an unreferenced object that an administrator must clean up through the
+Supabase Storage API. Profile updates use `updated_at` to detect conflicting
+edits; reload the profile and reapply changes if a conflict occurs. The migration
+does not rewrite historical order audit names.
 
 Customer numbers are generated in `src/utils/customerNumber.js` when a customer is
 created.

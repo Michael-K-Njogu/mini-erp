@@ -5,10 +5,12 @@ import { ChevronDown, User, LogOut } from '@lucide/vue'
 
 import { useAuth } from '../../composables/useAuth'
 import { useToast } from '../../composables/useToast'
+import { getDisplayName } from '../../utils/profile'
+import UserAvatar from './UserAvatar.vue'
 
 const router = useRouter()
 
-const { user, signOut } = useAuth()
+const { user, profile, signOut } = useAuth()
 
 const { success, error: showError } = useToast()
 
@@ -16,24 +18,7 @@ const isOpen = ref(false)
 const signingOut = ref(false)
 const menuRef = ref(null)
 
-const displayName = computed(() => {
-  return user.value?.user_metadata?.full_name || user.value?.email || 'User'
-})
-
-const userInitials = computed(() => {
-  const name = displayName.value
-
-  if (!name) {
-    return 'U'
-  }
-
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((part) => part.charAt(0))
-    .join('')
-    .toUpperCase()
-})
+const displayName = computed(() => getDisplayName(profile.value, user.value))
 
 function toggleMenu() {
   isOpen.value = !isOpen.value
@@ -41,6 +26,11 @@ function toggleMenu() {
 
 function closeMenu() {
   isOpen.value = false
+}
+
+function openProfile() {
+  closeMenu()
+  router.push({ name: 'profile' })
 }
 
 function handleClickOutside(event) {
@@ -87,11 +77,10 @@ onBeforeUnmount(() => {
       class="user-menu-trigger"
       :aria-expanded="isOpen"
       aria-haspopup="menu"
+      aria-label="Account menu"
       @click="toggleMenu"
     >
-      <span class="user-avatar">
-        {{ userInitials }}
-      </span>
+      <UserAvatar />
 
       <!--
       <span class="user-details">
@@ -110,9 +99,7 @@ onBeforeUnmount(() => {
 
     <div v-if="isOpen" class="user-menu-dropdown" role="menu">
       <div class="user-menu-header">
-        <span class="user-menu-avatar">
-          {{ userInitials }}
-        </span>
+        <UserAvatar />
 
         <div class="user-menu-account">
           <span class="user-menu-name">
@@ -125,8 +112,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <!-- Future profile page -->
-      <button type="button" class="user-menu-item" role="menuitem" disabled>
+      <button type="button" class="user-menu-item" role="menuitem" @click="openProfile">
         <User size="18" />
 
         <span>Profile</span>
@@ -172,26 +158,6 @@ onBeforeUnmount(() => {
 
 .user-menu-trigger:hover {
   background: var(--color-bg-subtle);
-}
-
-.user-avatar,
-.user-menu-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  width: 2.25rem;
-  height: 2.25rem;
-
-  border-radius: 50%;
-
-  background: var(--color-interactive-default);
-  color: var(--color-text-on-interactive);
-
-  font-size: 14px;
-  font-weight: 600;
 }
 
 .user-details {
