@@ -53,6 +53,19 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('profile page', () => {
+  it('uses the customer form sections and keeps account details read-only', () => {
+    const wrapper = mount(ProfileView)
+    const sections = wrapper.findAll('.form-section')
+    expect(sections.map((section) => section.find('h4').text())).toEqual([
+      'Personal Information',
+      'Account Information',
+    ])
+    expect(sections[0].find('.image-upload-content').exists()).toBe(true)
+    expect(sections[1].findAll('dt').map((label) => label.text())).toEqual(['Email', 'Role'])
+    expect(sections[1].findAll('input')).toHaveLength(0)
+    wrapper.unmount()
+  })
+
   it('validates values and saves using the loaded version', async () => {
     const wrapper = mount(ProfileView)
     await wrapper.find('#profile-name').setValue(' ')
