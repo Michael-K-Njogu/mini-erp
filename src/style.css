@@ -274,6 +274,14 @@ h1 {
   justify-content: center;
 }
 
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  border: 0;
+  background: var(--color-bg-scrim);
+}
+
 .sidebar-tooltip {
   position: fixed;
   z-index: 1100;
@@ -1100,6 +1108,77 @@ td {
   flex-direction: column;
   gap: 12px;
   z-index: 9999;
+}
+
+@media (max-width: 768px) {
+  .app-main,
+  .app-layout--collapsed .app-main {
+    margin-left: 0;
+  }
+
+  .sidebar {
+    width: min(250px, 85vw);
+    height: 100dvh;
+    min-height: 0;
+    z-index: 1001;
+  }
+
+  .sidebar-toggle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .top-bar-header {
+    padding: 0 12px;
+  }
+
+  .page-content {
+    padding: 16px;
+  }
+
+  .page-toolbar-region {
+    position: relative;
+    top: auto;
+  }
+
+  .notification-dropdown {
+    position: fixed;
+    top: 65px;
+    right: 8px;
+    width: min(360px, calc(100vw - 16px));
+    max-height: calc(100dvh - 80px);
+  }
+
+  .pagination,
+  .page-actions,
+  .form-actions {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-section__header,
+  .form-section__content {
+    padding: 16px;
+  }
+
+  .customer-account-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .account-summary-item + .account-summary-item {
+    border-left: 0;
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .toast-container {
+    left: 16px;
+    right: 16px;
+  }
 }
 
 .toast {

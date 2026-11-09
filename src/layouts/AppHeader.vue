@@ -7,7 +7,13 @@ import { useAuth } from '../composables/useAuth'
 import NotificationMenu from '../components/notifications/NotificationMenu.vue'
 import ThemeToggle from '../components/theme/ThemeToggle.vue'
 import UserMenu from '../components/user/UserMenu.vue'
-import { ChevronRight } from '@lucide/vue'
+import { ChevronRight, Menu } from '@lucide/vue'
+
+defineProps({
+  mobile: { type: Boolean, default: false },
+  navigationOpen: { type: Boolean, default: false },
+})
+defineEmits(['open-navigation'])
 
 const route = useRoute()
 const router = useRouter()
@@ -77,6 +83,17 @@ async function handleSignOut() {
 <template>
   <header class="top-bar-header">
     <div class="header-context">
+      <button
+        v-if="mobile"
+        class="mobile-navigation-toggle"
+        type="button"
+        aria-label="Open navigation"
+        aria-controls="app-sidebar"
+        :aria-expanded="navigationOpen"
+        @click="$emit('open-navigation')"
+      >
+        <Menu :size="24" aria-hidden="true" />
+      </button>
       <nav v-if="breadcrumbs.length > 1" class="breadcrumbs" aria-label="Breadcrumb">
         <template v-for="(breadcrumb, index) in breadcrumbs" :key="breadcrumb.label">
           <ChevronRight v-if="index > 0" class="breadcrumb-separator" :size="16" />
@@ -127,6 +144,26 @@ async function handleSignOut() {
 
 .header-actions {
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.mobile-navigation-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  background: transparent;
+  cursor: pointer;
+}
+
+.mobile-navigation-toggle:focus-visible {
+  outline: 2px solid var(--color-border-focus);
 }
 
 .page-title {
@@ -183,5 +220,23 @@ async function handleSignOut() {
 .breadcrumb-separator {
   flex-shrink: 0;
   color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+  .header-context {
+    gap: 4px;
+  }
+
+  .breadcrumbs,
+  .page-title {
+    overflow: hidden;
+  }
+
+  .breadcrumb-current,
+  .page-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 </style>

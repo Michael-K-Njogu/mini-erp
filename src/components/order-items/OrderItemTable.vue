@@ -50,90 +50,102 @@ const emit = defineEmits(['edit', 'delete'])
     </template>
   </BaseEmptyState>
 
-  <table v-else class="data-table">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Unit Price</th>
-        <th>Discount</th>
-        <th>Line Total</th>
-        <th v-if="editable"></th>
-      </tr>
-    </thead>
+  <div v-else class="order-item-table-wrapper" role="region" aria-label="Order items" tabindex="0">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Discount</th>
+          <th>Line Total</th>
+          <th v-if="editable"></th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <tr v-for="item in items" :key="item.id">
-        <td>
-          <div class="order-item-product">
-            <div class="order-item-image-placeholder" aria-hidden="true">
-              <Package :size="20" />
+      <tbody>
+        <tr v-for="item in items" :key="item.id">
+          <td>
+            <div class="order-item-product">
+              <div class="order-item-image-placeholder" aria-hidden="true">
+                <Package :size="20" />
+              </div>
+              <div class="order-item-product-details">
+                <div class="product-name">{{ item.productName }}</div>
+                <div class="product-sku">{{ item.sku }}</div>
+              </div>
             </div>
-            <div class="order-item-product-details">
-              <div class="product-name">{{ item.productName }}</div>
-              <div class="product-sku">{{ item.sku }}</div>
+          </td>
+
+          <td>{{ item.quantity }} {{ item.unit }}</td>
+
+          <td>
+            {{ formatCurrency(item.unitPrice) }}
+          </td>
+
+          <td>
+            {{ formatCurrency(item.discount) }}
+          </td>
+
+          <td>
+            {{ formatCurrency(item.lineTotal) }}
+          </td>
+
+          <td v-if="editable">
+            <div class="row-actions">
+              <BaseButton
+                :aria-label="`Edit ${item.productName}`"
+                :title="`Edit ${item.productName}`"
+                variant="secondary"
+                size="sm"
+                @click="$emit('edit', item)"
+                class="btn-icon"
+              >
+                <template #icon>
+                  <SquarePen :size="16" />
+                </template>
+              </BaseButton>
+
+              <BaseButton
+                :aria-label="`Delete ${item.productName}`"
+                :title="`Remove ${item.productName}`"
+                variant="danger"
+                size="sm"
+                @click="$emit('delete', item)"
+                class="btn-icon"
+              >
+                <template #icon>
+                  <Trash2 :size="16" />
+                </template>
+              </BaseButton>
             </div>
-          </div>
-        </td>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot v-if="showGrandTotal && items.length">
+        <tr class="order-total-row">
+          <td :colspan="editable ? 5 : 4">Grand Total</td>
 
-        <td>{{ item.quantity }} {{ item.unit }}</td>
-
-        <td>
-          {{ formatCurrency(item.unitPrice) }}
-        </td>
-
-        <td>
-          {{ formatCurrency(item.discount) }}
-        </td>
-
-        <td>
-          {{ formatCurrency(item.lineTotal) }}
-        </td>
-
-        <td v-if="editable">
-          <div class="row-actions">
-            <BaseButton
-              :aria-label="`Edit ${item.productName}`"
-              :title="`Edit ${item.productName}`"
-              variant="secondary"
-              size="sm"
-              @click="$emit('edit', item)"
-              class="btn-icon"
-            >
-              <template #icon>
-                <SquarePen :size="16" />
-              </template>
-            </BaseButton>
-
-            <BaseButton
-              :aria-label="`Delete ${item.productName}`"
-              :title="`Remove ${item.productName}`"
-              variant="danger"
-              size="sm"
-              @click="$emit('delete', item)"
-              class="btn-icon"
-            >
-              <template #icon>
-                <Trash2 :size="16" />
-              </template>
-            </BaseButton>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-    <tfoot v-if="showGrandTotal && items.length">
-      <tr class="order-total-row">
-        <td :colspan="editable ? 5 : 4">Grand Total</td>
-
-        <td>
-          {{ formatCurrency(grandTotal) }}
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+          <td>
+            {{ formatCurrency(grandTotal) }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </template>
 
 <style scoped>
+.order-item-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.order-item-table-wrapper:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
 .order-item-product {
   align-items: center;
   display: flex;

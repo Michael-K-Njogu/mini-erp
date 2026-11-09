@@ -275,4 +275,16 @@ const productOptions = computed(() =>
   color: var(--color-interactive-default);
   padding: 16px;
 }
+
+@media (max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 400px) {
+  .form-row {
+    flex-direction: column;
+  }
+}
 </style>

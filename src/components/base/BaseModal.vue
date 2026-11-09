@@ -123,6 +123,8 @@ onBeforeUnmount(() => {
 
 .modal {
   width: 100%;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
   box-shadow: var(--shadow-default);
   transition: transform 0.2s ease;
 }
@@ -168,5 +170,11 @@ onBeforeUnmount(() => {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 1rem;
+  }
 }
 </style>

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { PanelLeftClose, PanelLeftOpen } from '@lucide/vue'
+import { PanelLeftClose, PanelLeftOpen, X } from '@lucide/vue'
 
 import { navigation } from '../config/navigation.js'
 import { usePermissions } from '../composables/usePermissions.js'
@@ -11,10 +11,16 @@ import SidebarNavItem from '../components/SidebarNavItem.vue'
 const { hasPermission } = usePermissions()
 const { collapsed, toggle } = useSidebar()
 
+const props = defineProps({
+  mobile: { type: Boolean, default: false },
+  open: { type: Boolean, default: false },
+})
+defineEmits(['close'])
+const isCollapsed = computed(() => !props.mobile && collapsed.value)
 const tooltip = ref(null)
 
 function showTooltip(event) {
-  if (!collapsed.value) return
+  if (!isCollapsed.value) return
   const link = event.target.closest('.sidebar-nav-item')
   if (!link) return
   const rect = link.getBoundingClientRect()
@@ -46,12 +52,30 @@ const visibleNavigation = computed(() =>
 </script>
 
 <template>
-  <aside class="sidebar" :class="{ 'sidebar--collapsed': collapsed }">
+  <aside
+    v-show="!mobile || open"
+    id="app-sidebar"
+    class="sidebar"
+    :class="{ 'sidebar--collapsed': isCollapsed }"
+    :role="mobile ? 'dialog' : undefined"
+    :aria-modal="mobile ? 'true' : undefined"
+    :aria-label="mobile ? 'Navigation' : undefined"
+  >
     <div class="sidebar-header">
-      <div v-show="!collapsed" class="sidebar-brand">
+      <div v-show="!isCollapsed" class="sidebar-brand">
         <span>Mikey's Mini-ERP</span>
       </div>
       <button
+        v-if="mobile"
+        class="sidebar-toggle sidebar-close"
+        type="button"
+        aria-label="Close navigation"
+        @click="$emit('close')"
+      >
+        <X :size="24" aria-hidden="true" />
+      </button>
+      <button
+        v-else
         class="sidebar-toggle"
         type="button"
         :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
@@ -75,12 +99,12 @@ const visibleNavigation = computed(() =>
     >
       <ul class="sidebar-nav-list">
         <li v-for="item in visibleNavigation" :key="item.to" class="sidebar-nav-entry">
-          <SidebarNavItem v-bind="item" :collapsed="collapsed" />
+          <SidebarNavItem v-bind="item" :collapsed="isCollapsed" />
         </li>
       </ul>
     </nav>
 
-    <div v-show="!collapsed" class="sidebar-footer">
+    <div v-show="!isCollapsed" class="sidebar-footer">
       <small>Version 1.0.0</small>
     </div>
 

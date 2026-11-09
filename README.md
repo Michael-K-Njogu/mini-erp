@@ -29,6 +29,7 @@ browser-mocked API development evolve alongside the business features.
 - Reusable Vue components for forms, buttons, modals, inputs, selects, badges,
   alerts, empty states, and layout-matched loading skeletons for tables and
   detail pages
+- Mobile navigation drawer and responsive shared forms and layouts
 - MSW browser mocks for local development
 
 The Mini ERP is under active development; see the roadmap for completed
@@ -138,9 +139,12 @@ npm run test:run      # Run Vitest once
 npm run test:ui       # Open the Vitest UI
 ```
 
-The test tooling is configured, but the project does not yet contain test files.
-`npm run test:run` will therefore report that no test files were found until tests
-are added.
+The test suite includes dashboard calculations and responsive navigation tests.
+Run `npm run test:run` to execute it once.
+
+The app currently requires a network connection for its business workflows.
+Offline data storage, synchronization, and conflict resolution are not yet
+implemented.
 
 ## Project Structure
 
