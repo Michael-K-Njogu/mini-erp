@@ -11,7 +11,9 @@ import {
 } from '../services/profileService'
 import { profileSchema } from '../validation/profileSchema'
 import { getDisplayName, getInitials } from '../utils/profile'
+import { LockKeyhole, User } from '@lucide/vue'
 import BaseButton from '../components/base/BaseButton.vue'
+import BaseFormSection from '../components/base/BaseFormSection.vue'
 import BaseTextInput from '../components/base/BaseTextInput.vue'
 import Alert from '../components/Alert.vue'
 
@@ -149,82 +151,104 @@ async function save() {
 <template>
   <div class="profile-page">
     <Alert v-if="!profile" type="danger" message="Your profile is unavailable. Try reloading it." />
-    <form v-else class="form-container" @submit.prevent="save">
-      <h2>Personal details</h2>
-      <p class="profile-description">Update the details shown in your account.</p>
+    <form v-else @submit.prevent="save">
+      <BaseFormSection title="Personal Information">
+        <template #icon><User aria-hidden="true" /></template>
+        <template #content>
+          <div class="form-group">
+            <label for="profile-image">Profile picture</label>
+            <div class="image-upload-content profile-picture">
+              <div class="profile-picture__preview" aria-hidden="true">
+                <img v-if="displayedAvatar" :src="displayedAvatar" alt="" />
+                <span v-else>{{ initials }}</span>
+              </div>
+              <div class="profile-picture__controls">
+                <input
+                  id="profile-image"
+                  ref="fileInput"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  :disabled="saving || isDemo"
+                  :aria-describedby="errors.image ? 'profile-image-error' : 'profile-image-hint'"
+                  @change="selectImage"
+                />
+                <p id="profile-image-hint" class="image-upload-hint">
+                  JPEG, PNG or WebP, up to 2 MB.
+                  <template v-if="isDemo">
+                    Picture uploads are unavailable in demo accounts.
+                  </template>
+                </p>
+                <p v-if="errors.image" id="profile-image-error" class="invalid" role="alert">
+                  {{ errors.image }}
+                </p>
+                <BaseButton
+                  v-if="selectedFile || (avatarPath && !removeImage)"
+                  label="Remove picture"
+                  variant="secondary"
+                  :disabled="saving"
+                  @click="removeAvatar"
+                />
+              </div>
+            </div>
+          </div>
 
-      <div class="profile-picture">
-        <div class="profile-picture__preview" aria-hidden="true">
-          <img v-if="displayedAvatar" :src="displayedAvatar" alt="" />
-          <span v-else>{{ initials }}</span>
-        </div>
-        <div class="profile-picture__controls">
-          <label for="profile-image">Profile picture</label>
-          <input
-            id="profile-image"
-            ref="fileInput"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            :disabled="saving || isDemo"
-            :aria-describedby="errors.image ? 'profile-image-error' : 'profile-image-hint'"
-            @change="selectImage"
-          />
-          <p id="profile-image-hint" class="profile-description">
-            JPEG, PNG or WebP, up to 2 MB.
-            <template v-if="isDemo">Picture uploads are unavailable in demo accounts.</template>
-          </p>
-          <p v-if="errors.image" id="profile-image-error" class="invalid" role="alert">
-            {{ errors.image }}
-          </p>
-          <BaseButton
-            v-if="selectedFile || (avatarPath && !removeImage)"
-            label="Remove picture"
-            variant="secondary"
-            :disabled="saving"
-            @click="removeAvatar"
-          />
-        </div>
-      </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <BaseTextInput
+                id="profile-name"
+                v-model="values.displayName"
+                label="Display name"
+                name="displayName"
+                autocomplete="name"
+                placeholder="Enter your display name"
+                :class="{ 'is-invalid': errors.displayName }"
+                :disabled="saving"
+                :aria-invalid="!!errors.displayName"
+                :aria-describedby="errors.displayName ? 'profile-name-error' : undefined"
+              />
+              <p v-if="errors.displayName" id="profile-name-error" class="invalid" role="alert">
+                {{ errors.displayName }}
+              </p>
+            </div>
+            <div class="form-group">
+              <BaseTextInput
+                id="profile-phone"
+                v-model="values.phoneNumber"
+                label="Phone number"
+                name="phoneNumber"
+                type="tel"
+                autocomplete="tel"
+                placeholder="Enter your phone number"
+                :class="{ 'is-invalid': errors.phoneNumber }"
+                :required="false"
+                :disabled="saving"
+                :aria-invalid="!!errors.phoneNumber"
+                :aria-describedby="errors.phoneNumber ? 'profile-phone-error' : undefined"
+              />
+              <p v-if="errors.phoneNumber" id="profile-phone-error" class="invalid" role="alert">
+                {{ errors.phoneNumber }}
+              </p>
+            </div>
+          </div>
+        </template>
+      </BaseFormSection>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <BaseTextInput
-            id="profile-name"
-            v-model="values.displayName"
-            label="Display name"
-            name="displayName"
-            autocomplete="name"
-            :disabled="saving"
-            :aria-invalid="!!errors.displayName"
-            :aria-describedby="errors.displayName ? 'profile-name-error' : undefined"
-          />
-          <p v-if="errors.displayName" id="profile-name-error" class="invalid" role="alert">
-            {{ errors.displayName }}
-          </p>
-        </div>
-        <div class="form-group">
-          <BaseTextInput
-            id="profile-phone"
-            v-model="values.phoneNumber"
-            label="Phone number"
-            name="phoneNumber"
-            type="tel"
-            autocomplete="tel"
-            :required="false"
-            :disabled="saving"
-            :aria-invalid="!!errors.phoneNumber"
-            :aria-describedby="errors.phoneNumber ? 'profile-phone-error' : undefined"
-          />
-          <p v-if="errors.phoneNumber" id="profile-phone-error" class="invalid" role="alert">
-            {{ errors.phoneNumber }}
-          </p>
-        </div>
-      </div>
-      <div class="profile-readonly">
-        <p><strong>Email:</strong> {{ user?.email || 'Not available' }}</p>
-        <p><strong>Role:</strong> {{ profile.role }}</p>
-        <p class="profile-description">Email and role are managed separately.</p>
-      </div>
+      <BaseFormSection title="Account Information">
+        <template #icon><LockKeyhole aria-hidden="true" /></template>
+        <template #content>
+          <dl class="form-grid profile-account">
+            <div>
+              <dt>Email</dt>
+              <dd>{{ user?.email || 'Not available' }}</dd>
+            </div>
+            <div>
+              <dt>Role</dt>
+              <dd>{{ profile.role }}</dd>
+            </div>
+          </dl>
+        </template>
+      </BaseFormSection>
+
       <div class="form-actions">
         <BaseButton
           label="Cancel"
@@ -250,23 +274,8 @@ async function save() {
 </template>
 
 <style scoped>
-.profile-page {
-  width: 100%;
-  max-width: 760px;
-}
-
-.profile-description {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
 .profile-picture {
-  display: flex;
   flex-wrap: wrap;
-  gap: var(--space-4);
-  align-items: center;
-  margin: var(--space-4) 0;
 }
 
 .profile-picture__preview {
@@ -301,8 +310,24 @@ async function save() {
   max-width: 100%;
 }
 
-.profile-readonly p {
-  margin: var(--space-2) 0;
+.profile-picture__controls .image-upload-hint,
+.profile-picture__controls .invalid {
+  margin: 0;
+}
+
+.profile-account {
+  margin: 0;
+}
+
+.profile-account dt {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.profile-account dd {
+  margin: 0;
   overflow-wrap: anywhere;
 }
 </style>
