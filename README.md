@@ -22,8 +22,11 @@ browser-mocked API development evolve alongside the business features.
   showing who performed each stage
 - Dashboard with a personalised "Welcome Back" greeting
 - Customer credit calculations and invoice preview with browser printing
-- Chart.js dashboard visualizations for sales, open orders, and stock health,
-  with text alternatives and responsive layouts
+- Chart.js dashboard visualizations for completed sales, order status, open
+  orders, and stock health, with text alternatives and responsive layouts
+- Dashboard date presets and custom ranges (up to 366 local calendar days),
+  comparisons with the preceding equal-length period, recent order and customer
+  creations, top customers, and CSV export of orders created in the range
 - Search, filtering, sorting, and pagination on list views
 - Notifications with unread counts, read-state actions, and entity navigation
 - Supabase authentication, session protection, sign-in, and sign-out
@@ -38,6 +41,14 @@ browser-mocked API development evolve alongside the business features.
 
 The Mini ERP is under active development; see the roadmap for completed
 functionality, current gaps, and planned modules.
+
+Dashboard sales and top customers use orders currently marked Completed and
+completed during the selected range. Order counts, status breakdown, activity,
+and CSV exports use creation dates; open orders and stock health are current
+snapshots. The activity feed is not an audit log. Data is subject to the
+signed-in user's permissions and Supabase row-level policies. Dashboard reads
+are paginated, not transactionally consistent snapshots: concurrent changes
+may require refreshing the dashboard.
 
 ## Tech Stack
 
