@@ -46,7 +46,8 @@ async function handleExit() {
 
       <span>
         <strong>Demo workspace.</strong>
-        Explore freely: your changes are private to you and are cleared after 24 hours.
+        Explore freely. your changes are private and reset after 24 hours. Work in progress; bugs
+        may occur!
       </span>
     </p>
 
