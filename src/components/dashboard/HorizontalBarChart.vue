@@ -6,6 +6,7 @@ import './chartSetup'
 
 const props = defineProps({
   bars: { type: Array, required: true },
+  label: { type: String, default: 'Open orders' },
 })
 
 const { colors, resolveColor } = useChartColors()
@@ -46,10 +47,10 @@ const options = computed(() => ({
 
 <template>
   <div class="hbar">
-    <div class="hbar__chart">
+    <div class="hbar__chart" :style="{ height: `${Math.max(140, bars.length * 38)}px` }">
       <Bar v-if="colors" :data="data" :options="options" aria-hidden="true" />
     </div>
-    <ul class="hbar__values" aria-label="Open orders">
+    <ul class="hbar__values" :aria-label="label">
       <li v-for="bar in bars" :key="bar.label" :aria-label="`${bar.label}: ${bar.value}`">
         <span>{{ bar.label }}</span>
         <strong>{{ bar.value }}</strong>

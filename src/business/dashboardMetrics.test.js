@@ -6,6 +6,10 @@ import {
   calculateDailySales,
   calculateStockHealth,
   calculateChange,
+  getDateRange,
+  formatLocalDate,
+  ordersCreatedInRange,
+  calculateTopCustomers,
 } from './dashboardMetrics'
 
 const NOW = new Date('2026-11-03T12:00:00Z')
@@ -97,5 +101,74 @@ describe('dashboardMetrics', () => {
       outOfStock: 1,
       total: 3,
     })
+  })
+
+  it('uses inclusive local calendar dates and an equal preceding period', () => {
+    const range = getDateRange('2024-03-09', '2024-03-11')
+    expect(range.days).toBe(3)
+    expect(formatLocalDate(range.previousStart)).toBe('2024-03-06')
+    expect(formatLocalDate(range.currentEnd)).toBe('2024-03-12')
+    const at = (year, month, day, hour = 0) => new Date(year, month - 1, day, hour).toISOString()
+    const sample = [
+      {
+        createdAt: at(2024, 3, 8, 23),
+        completedAt: at(2024, 3, 9),
+        status: 'Completed',
+        grandTotal: 10,
+        customerId: 'a',
+      },
+      {
+        createdAt: at(2024, 3, 9),
+        completedAt: at(2024, 3, 11, 23),
+        status: 'Completed',
+        grandTotal: 20,
+        customerId: 'b',
+      },
+      {
+        createdAt: at(2024, 3, 12),
+        completedAt: at(2024, 3, 12),
+        status: 'Completed',
+        grandTotal: 30,
+        customerId: 'c',
+      },
+    ]
+    const customers = [{ createdAt: at(2024, 3, 9) }, { createdAt: at(2024, 3, 12) }]
+    expect(ordersCreatedInRange(sample, range)).toHaveLength(1)
+    expect(calculateSalesMetrics(sample, range, customers).current).toMatchObject({
+      salesTotal: 30,
+      completedCount: 2,
+      ordersCreated: 1,
+      newCustomers: 1,
+    })
+    expect(calculateDailySales(sample, range).map((day) => day.total)).toEqual([10, 0, 20])
+  })
+
+  it('validates custom dates and allows at most 366 inclusive days', () => {
+    expect(getDateRange('2024-01-01', '2024-12-31').days).toBe(366)
+    expect(() => getDateRange('2024-01-01', '2025-01-01')).toThrow('366')
+    expect(() => getDateRange('2024-02-30', '2024-03-01')).toThrow('valid')
+    expect(() => getDateRange('2024-03-02', '2024-03-01')).toThrow('valid')
+  })
+
+  it('ranks up to five customers by completed sales in the chosen period', () => {
+    const range = getDateRange('2024-01-01', '2024-01-31')
+    const sample = Array.from({ length: 6 }, (_, index) => ({
+      customerId: String(index),
+      customerName: `Customer ${index}`,
+      grandTotal: index + 1,
+      status: 'Completed',
+      completedAt: new Date(2024, 0, 10).toISOString(),
+    }))
+    sample.push(
+      { ...sample[0], grandTotal: 10 },
+      { ...sample[5], status: 'Pending', grandTotal: 100 },
+    )
+    expect(calculateTopCustomers(sample, range).map((item) => [item.id, item.total])).toEqual([
+      ['0', 11],
+      ['5', 6],
+      ['4', 5],
+      ['3', 4],
+      ['2', 3],
+    ])
   })
 })

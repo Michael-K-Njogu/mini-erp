@@ -1,8 +1,14 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useDashboard } from '../composables/useDashboard'
-import { formatCurrency } from '../utils/formatters'
+import { formatCurrency, formatDate } from '../utils/formatters'
+import { formatLocalDate, getDashboardPeriods, getDateRange } from '../business/dashboardMetrics'
+import { downloadOrdersCsv } from '../utils/exportOrdersCsv'
+import { ORDER_STATUS } from '../constants/orderStatuses'
+import { usePermissions } from '../composables/usePermissions'
+import { PERMISSION } from '../constants/permissions'
+import { useToast } from '../composables/useToast'
 import { getDisplayName } from '../utils/profile'
 import Alert from '../components/Alert.vue'
 import KpiCard from '../components/dashboard/KpiCard.vue'
@@ -10,15 +16,77 @@ import DashboardSection from '../components/dashboard/DashboardSection.vue'
 import SalesTrendChart from '../components/dashboard/SalesTrendChart.vue'
 import DonutChart from '../components/dashboard/DonutChart.vue'
 import HorizontalBarChart from '../components/dashboard/HorizontalBarChart.vue'
+import BaseButton from '../components/base/BaseButton.vue'
 
 const { user, profile } = useAuth()
-const { loading, error, periods, sales, openOrders, dailySales, stockHealth } = useDashboard()
+const {
+  loading,
+  error,
+  periods,
+  sales,
+  openOrders,
+  dailySales,
+  stockHealth,
+  periodOrders,
+  topCustomers,
+  activity,
+  refresh,
+} = useDashboard()
+const { hasPermission } = usePermissions()
+const { error: showError } = useToast()
+const preset = ref('30')
+const startDate = ref(formatLocalDate(periods.value.currentStart))
+const endDate = ref(
+  formatLocalDate(
+    new Date(
+      periods.value.currentEnd.getFullYear(),
+      periods.value.currentEnd.getMonth(),
+      periods.value.currentEnd.getDate() - 1,
+    ),
+  ),
+)
+const dateError = ref('')
+
+async function applyRange() {
+  try {
+    let range
+    if (preset.value === 'custom') {
+      range = getDateRange(startDate.value, endDate.value)
+    } else {
+      range = getDashboardPeriods(new Date(), Number(preset.value))
+      startDate.value = formatLocalDate(range.currentStart)
+      const lastDay = new Date(range.currentEnd)
+      lastDay.setDate(lastDay.getDate() - 1)
+      endDate.value = formatLocalDate(lastDay)
+    }
+    dateError.value = ''
+    await refresh(range)
+  } catch (err) {
+    dateError.value = err.message
+  }
+}
+
+function exportOrders() {
+  try {
+    const orders = hasPermission(PERMISSION.CUSTOMER_VIEW)
+      ? periodOrders.value
+      : periodOrders.value.map((order) => ({ ...order, customerName: '' }))
+    downloadOrdersCsv(orders, periods.value)
+  } catch (err) {
+    console.error('Unable to export orders:', err)
+    showError('Unable to export orders. Please try again.')
+  }
+}
 
 const displayName = computed(() => {
   return getDisplayName(profile.value, user.value, 'there')
 })
 
-const windowLabel = computed(() => `Last ${periods.value.days} days`)
+const windowLabel = computed(() => {
+  const end = new Date(periods.value.currentEnd)
+  end.setDate(end.getDate() - 1)
+  return `${formatLocalDate(periods.value.currentStart)} to ${formatLocalDate(end)}`
+})
 
 function changeTrend(change) {
   if (change === null) {
@@ -38,7 +106,7 @@ const cards = computed(() => {
   const { current, changes } = sales.value
   const stock = stockHealth.value
 
-  return [
+  const result = [
     {
       key: 'sales',
       label: `Sales (${windowLabel.value.toLowerCase()})`,
@@ -62,6 +130,18 @@ const cards = computed(() => {
       label: 'Active customers',
       value: current.activeCustomers,
       ...changeTrend(changes.activeCustomers),
+    },
+    {
+      key: 'new-customers',
+      label: 'New customers',
+      value: current.newCustomers,
+      ...changeTrend(changes.newCustomers),
+    },
+    {
+      key: 'completed',
+      label: 'Completed orders',
+      value: current.completedCount,
+      ...changeTrend(changes.completedCount),
     },
     {
       key: 'open',
@@ -88,6 +168,11 @@ const cards = computed(() => {
       trendText: stock.outOfStock ? 'Needs restocking' : 'All items available',
     },
   ]
+  return result.filter((card) => {
+    if (['low', 'out'].includes(card.key)) return true
+    if (card.key === 'new-customers') return hasPermission(PERMISSION.CUSTOMER_VIEW)
+    return hasPermission(PERMISSION.ORDER_VIEW)
+  })
 })
 
 const openOrderBars = computed(() => [
@@ -120,14 +205,54 @@ const stockSegments = computed(() => [
     colour: 'var(--color-chart-status-negative)',
   },
 ])
+
+const orderStatusBars = computed(() =>
+  Object.values(ORDER_STATUS).map((status, index) => ({
+    label: status,
+    value: periodOrders.value.filter((order) => order.status === status).length,
+    colour: index % 2 ? 'var(--color-chart-categorical-03)' : 'var(--color-chart-categorical-01)',
+  })),
+)
 </script>
 
 <template>
   <h1>Welcome back, {{ displayName }}</h1>
 
+  <form class="dashboard-filters" @submit.prevent="applyRange">
+    <div>
+      <label for="dashboard-range">Date range</label>
+      <select id="dashboard-range" v-model="preset" :disabled="loading">
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+        <option value="custom">Custom range</option>
+      </select>
+    </div>
+    <template v-if="preset === 'custom'">
+      <div>
+        <label for="dashboard-start">Start date</label>
+        <input id="dashboard-start" v-model="startDate" type="date" :disabled="loading" required />
+      </div>
+      <div>
+        <label for="dashboard-end">End date</label>
+        <input id="dashboard-end" v-model="endDate" type="date" :disabled="loading" required />
+      </div>
+    </template>
+    <BaseButton label="Apply" type="submit" :disabled="loading" />
+    <BaseButton
+      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+      label="Export orders CSV"
+      variant="secondary"
+      :disabled="loading || !!error"
+      @click="exportOrders"
+    />
+    <p v-if="dateError" class="invalid" role="alert">{{ dateError }}</p>
+  </form>
+
+  <p>Selected range: {{ windowLabel }}. Open orders and stock health are current snapshots.</p>
   <Alert v-if="error" type="danger" :message="error" />
 
-  <div class="dashboard-kpis">
+  <div v-if="!error || loading" class="dashboard-kpis">
     <KpiCard
       v-for="card in cards"
       :key="card.key"
@@ -143,6 +268,7 @@ const stockSegments = computed(() => [
   <div class="dashboard-charts">
     <DashboardSection
       class="dashboard-charts__wide"
+      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
       title="Sales trend"
       :subtitle="`Daily completed sales · ${windowLabel}`"
     >
@@ -151,7 +277,11 @@ const stockSegments = computed(() => [
       <SalesTrendChart v-else :points="dailySales" />
     </DashboardSection>
 
-    <DashboardSection title="Open orders" subtitle="Pending and processing right now">
+    <DashboardSection
+      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+      title="Open orders"
+      subtitle="Pending and processing right now"
+    >
       <p v-if="loading" class="dashboard-chart-state" role="status">Loading chart data...</p>
       <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
       <HorizontalBarChart v-else :bars="openOrderBars" />
@@ -162,10 +292,124 @@ const stockSegments = computed(() => [
       <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
       <DonutChart v-else :segments="stockSegments" />
     </DashboardSection>
+
+    <DashboardSection
+      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+      title="Order status"
+      subtitle="Current status of orders created in the selected range"
+    >
+      <p v-if="loading" class="dashboard-chart-state" role="status">Loading chart data...</p>
+      <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
+      <HorizontalBarChart v-else :bars="orderStatusBars" label="Orders by status" />
+    </DashboardSection>
+
+    <DashboardSection
+      v-if="hasPermission(PERMISSION.ORDER_VIEW) && hasPermission(PERMISSION.CUSTOMER_VIEW)"
+      title="Top customers"
+      subtitle="Completed sales in the selected range"
+    >
+      <p v-if="loading" class="dashboard-chart-state" role="status">Loading customers...</p>
+      <p v-else-if="error" class="dashboard-chart-state">Customer data is unavailable.</p>
+      <p v-else-if="!topCustomers.length" class="dashboard-chart-state">
+        No completed sales in this range.
+      </p>
+      <ol v-else class="dashboard-list">
+        <li v-for="customer in topCustomers" :key="customer.id">
+          <RouterLink
+            v-if="hasPermission(PERMISSION.CUSTOMER_VIEW)"
+            :to="{ name: 'customer-details', params: { id: customer.id } }"
+            >{{ customer.name }}</RouterLink
+          >
+          <span v-else>{{ customer.name }}</span>
+          <strong>{{ formatCurrency(customer.total) }}</strong>
+        </li>
+      </ol>
+    </DashboardSection>
+
+    <DashboardSection
+      v-if="hasPermission(PERMISSION.ORDER_VIEW) || hasPermission(PERMISSION.CUSTOMER_VIEW)"
+      class="dashboard-charts__wide"
+      title="Recent activity"
+      subtitle="Orders and customers created in the selected range"
+    >
+      <p v-if="loading" class="dashboard-chart-state" role="status">Loading activity...</p>
+      <p v-else-if="error" class="dashboard-chart-state">Activity is unavailable.</p>
+      <p v-else-if="!activity.length" class="dashboard-chart-state">No activity in this range.</p>
+      <ul v-else class="dashboard-list">
+        <li v-for="item in activity" :key="`${item.type}-${item.id}`">
+          <div>
+            <RouterLink
+              v-if="
+                hasPermission(
+                  item.type === 'order' ? PERMISSION.ORDER_VIEW : PERMISSION.CUSTOMER_VIEW,
+                )
+              "
+              :to="{
+                name: item.type === 'order' ? 'order-details' : 'customer-details',
+                params: { id: item.id },
+              }"
+              >{{ item.title }}</RouterLink
+            >
+            <span v-else>{{ item.title }}</span>
+            <span class="activity-detail">{{
+              item.type === 'order'
+                ? `Order created${item.detail ? ` · ${item.detail}` : ''}`
+                : item.detail
+            }}</span>
+          </div>
+          <time :datetime="item.date">{{ formatDate(item.date) }}</time>
+        </li>
+      </ul>
+    </DashboardSection>
   </div>
 </template>
 
 <style scoped>
+.dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.dashboard-filters input,
+.dashboard-filters select {
+  min-height: 44px;
+  max-width: 100%;
+}
+
+.dashboard-filters .invalid {
+  flex-basis: 100%;
+}
+
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.activity-detail {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.dashboard-list time {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
 .dashboard-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
