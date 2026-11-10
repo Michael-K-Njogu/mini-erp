@@ -59,7 +59,6 @@ building-materials business.
 
 ## In Progress
 
-- [ ] Replace the Dashboard placeholder with operational metrics and recent activity
 - [ ] Expose invoice preview and printing through a dedicated invoice workflow
 - [ ] Add automated tests for services, composables, business rules, and key forms
 
@@ -68,10 +67,10 @@ building-materials business.
 ### Dashboard and Reporting
 
 - [ ] Customer, order, product, and revenue summary cards
-- [ ] Orders by status and revenue trends
-- [ ] Recent orders and customer activity feed
-- [ ] Date-range and amount-range filters
-- [ ] Export operational lists to CSV
+- [x] Orders by status and revenue trends
+- [x] Recent order and customer creation activity
+- [x] Dashboard date-range filters and order CSV export
+- [ ] Amount-range filters and CSV exports for other operational lists
 
 ### Invoicing and Payments
 
