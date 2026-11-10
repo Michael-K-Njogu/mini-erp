@@ -2,6 +2,8 @@
 
 This is a Mini ERP for managing the day-to-day operations of any business. It brings customer, product, and sales-order workflows together, with role-aware access, account credit calculations, and invoice previews.
 
+Try the [live demo](https://mikes-mini-erp-demo.netlify.app/).
+
 The application is being built out as an operational hub. Its current workflows
 are backed by Supabase, while reporting, invoicing and payments, and deeper
 inventory management are part of the roadmap. The project also serves as a UI
@@ -185,18 +187,35 @@ src/
 	validation/   Zod validation schemas
 	views/        Route-level pages
 supabase/
-	migrations/   SQL migrations (baseline schema, customer_number, order actor
-	              audit, demo mode)
+	migrations/   SQL migrations for the baseline schema, demo mode, and
+	              subsequent database changes
 ```
 
 ## Database Migrations
 
-SQL migrations live in `supabase/migrations/`. Apply them to your Supabase project
-(SQL editor or `supabase db push`) before using the related features:
+SQL migrations live in `supabase/migrations/`. For a new, empty project, start
+with the baseline schema, then apply the remaining migrations in timestamp order.
+The demo-mode migration is only for a dedicated demo project; do not apply it to
+production or a project with existing business data. For an existing project,
+do not apply the baseline schema; review and apply only the migrations needed for
+its current schema. You can apply SQL through the Supabase SQL Editor or use
+`supabase db push` when the local Supabase CLI project is linked to the intended
+remote project.
 
-- `add_customer_number`: adds the `customer_number` column to `customers`
-- `add_order_actor_audit`: adds created/updated/stage actor columns and a trigger
-  on `orders` that records the acting user
+Migration files, in timestamp order:
+
+- `20261001000000_baseline_schema.sql`: creates the initial application tables
+  and policies for a new, empty project. Do not run it against a project whose
+  tables already exist.
+- `20261006220000_add_customer_number.sql`: adds a unique `customer_number`
+  column to `customers`.
+- `20261007101500_add_order_actor_audit.sql`: adds order actor-audit columns and
+  a trigger that records the acting user.
+- `20261008000000_demo_mode.sql`: configures isolated anonymous demo workspaces,
+  row-level security, sample-data provisioning, cleanup, and the demo storage
+  bucket. Apply only to the separate demo project.
+- `20261008000100_api_grants.sql`: grants the Data API table privileges used by
+  the application; row-level security still controls accessible rows.
 - `20261109200000_user_profiles.sql`: adds profile fields, self-service access
   controls, a private profile-image bucket, and profile-based order audit names.
   Review existing grants, RLS policies, and triggers before applying it to an
