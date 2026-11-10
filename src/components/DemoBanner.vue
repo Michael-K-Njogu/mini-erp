@@ -45,9 +45,9 @@ async function handleExit() {
       <FlaskConical :size="16" aria-hidden="true" />
 
       <span>
-        <strong>Demo workspace.</strong>
-        Explore freely. your changes are private and reset after 24 hours. Work in progress; bugs
-        may occur!
+        <strong>Demo workspace:&nbsp;</strong>
+        Feel free to explore; changes are private and reset after 24 hours. (Work in progress; bugs
+        may occur.)
       </span>
     </p>
 
