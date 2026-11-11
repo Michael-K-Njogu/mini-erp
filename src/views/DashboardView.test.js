@@ -33,6 +33,12 @@ const mountDashboard = () =>
     },
   })
 
+const clickTab = (wrapper, label) =>
+  wrapper
+    .findAll('[role="tab"]')
+    .find((tab) => tab.text() === label)
+    .trigger('click')
+
 beforeEach(() => {
   vi.clearAllMocks()
   profile.value = { display_name: 'Alex', role: 'Sales' }
@@ -65,14 +71,16 @@ describe('dashboard', () => {
     await wrapper.find('form').trigger('submit')
     await flushPromises()
     expect(wrapper.text()).toContain('Selected range: 2024-01-01 to 2024-01-31')
-    expect(wrapper.text()).toContain('SO-1')
     expect(wrapper.text()).toContain('Acme')
+    await clickTab(wrapper, 'Orders')
     const statusChart = wrapper
       .findAllComponents(HorizontalBarChart)
       .find((chart) => chart.props('label') === 'Orders by status')
     expect(statusChart.props('bars')).toContainEqual(
       expect.objectContaining({ label: 'Completed', value: 1 }),
     )
+    await clickTab(wrapper, 'Activity')
+    expect(wrapper.text()).toContain('SO-1')
     expect(
       wrapper.findAllComponents({ name: 'RouterLink' }).map((link) => link.props('to')),
     ).toContainEqual({ name: 'order-details', params: { id: 'o1' } })
