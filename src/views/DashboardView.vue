@@ -17,6 +17,7 @@ import SalesTrendChart from '../components/dashboard/SalesTrendChart.vue'
 import DonutChart from '../components/dashboard/DonutChart.vue'
 import HorizontalBarChart from '../components/dashboard/HorizontalBarChart.vue'
 import BaseButton from '../components/base/BaseButton.vue'
+import BaseNavTab from '../components/base/BaseNavTab.vue'
 
 const { user, profile } = useAuth()
 const {
@@ -175,6 +176,24 @@ const cards = computed(() => {
   })
 })
 
+const tabs = computed(() => {
+  const canViewOrders = hasPermission(PERMISSION.ORDER_VIEW)
+  return [
+    canViewOrders && { value: 'sales', label: 'Sales', panelId: 'dashboard-tabs-panel-sales' },
+    canViewOrders && { value: 'orders', label: 'Orders', panelId: 'dashboard-tabs-panel-orders' },
+    { value: 'inventory', label: 'Inventory', panelId: 'dashboard-tabs-panel-inventory' },
+    (canViewOrders || hasPermission(PERMISSION.CUSTOMER_VIEW)) && {
+      value: 'activity',
+      label: 'Activity',
+      panelId: 'dashboard-tabs-panel-activity',
+    },
+  ].filter(Boolean)
+})
+const activeTab = ref('sales')
+const currentTab = computed(
+  () => tabs.value.find((tab) => tab.value === activeTab.value)?.value ?? tabs.value[0].value,
+)
+
 const openOrderBars = computed(() => [
   {
     label: 'Pending',
@@ -265,10 +284,22 @@ const orderStatusBars = computed(() =>
     />
   </div>
 
-  <div class="dashboard-charts">
+  <BaseNavTab
+    id="dashboard-tabs"
+    v-model="activeTab"
+    aria-label="Dashboard details"
+    :items="tabs"
+  />
+
+  <div
+    :id="`dashboard-tabs-panel-${currentTab}`"
+    class="dashboard-charts"
+    role="tabpanel"
+    :aria-labelledby="`dashboard-tabs-tab-${currentTab}`"
+  >
     <DashboardSection
       class="dashboard-charts__wide"
-      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+      v-if="currentTab === 'sales'"
       title="Sales trend"
       :subtitle="`Daily completed sales · ${windowLabel}`"
     >
@@ -278,7 +309,7 @@ const orderStatusBars = computed(() =>
     </DashboardSection>
 
     <DashboardSection
-      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+      v-if="currentTab === 'orders'"
       title="Open orders"
       subtitle="Pending and processing right now"
     >
@@ -287,14 +318,18 @@ const orderStatusBars = computed(() =>
       <HorizontalBarChart v-else :bars="openOrderBars" />
     </DashboardSection>
 
-    <DashboardSection title="Stock health" subtitle="Available quantity vs reorder level">
+    <DashboardSection
+      v-if="currentTab === 'inventory'"
+      title="Stock health"
+      subtitle="Available quantity vs reorder level"
+    >
       <p v-if="loading" class="dashboard-chart-state" role="status">Loading chart data...</p>
       <p v-else-if="error" class="dashboard-chart-state">Chart data is unavailable.</p>
       <DonutChart v-else :segments="stockSegments" />
     </DashboardSection>
 
     <DashboardSection
-      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+      v-if="currentTab === 'orders'"
       title="Order status"
       subtitle="Current status of orders created in the selected range"
     >
@@ -304,7 +339,7 @@ const orderStatusBars = computed(() =>
     </DashboardSection>
 
     <DashboardSection
-      v-if="hasPermission(PERMISSION.ORDER_VIEW) && hasPermission(PERMISSION.CUSTOMER_VIEW)"
+      v-if="currentTab === 'sales' && hasPermission(PERMISSION.CUSTOMER_VIEW)"
       title="Top customers"
       subtitle="Completed sales in the selected range"
     >
@@ -327,7 +362,7 @@ const orderStatusBars = computed(() =>
     </DashboardSection>
 
     <DashboardSection
-      v-if="hasPermission(PERMISSION.ORDER_VIEW) || hasPermission(PERMISSION.CUSTOMER_VIEW)"
+      v-if="currentTab === 'activity'"
       class="dashboard-charts__wide"
       title="Recent activity"
       subtitle="Orders and customers created in the selected range"
