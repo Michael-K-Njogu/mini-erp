@@ -176,6 +176,15 @@ const cards = computed(() => {
   })
 })
 
+const getInitials = (name) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('')
+const formatShare = (share) => `${(share * 100).toFixed(share > 0 && share < 0.1 ? 1 : 0)}%`
+
 const tabs = computed(() => {
   const canViewOrders = hasPermission(PERMISSION.ORDER_VIEW)
   return [
@@ -294,11 +303,11 @@ const orderStatusBars = computed(() =>
   <div
     :id="`dashboard-tabs-panel-${currentTab}`"
     class="dashboard-charts"
+    :class="{ 'dashboard-charts--sales': currentTab === 'sales' }"
     role="tabpanel"
     :aria-labelledby="`dashboard-tabs-tab-${currentTab}`"
   >
     <DashboardSection
-      class="dashboard-charts__wide"
       v-if="currentTab === 'sales'"
       title="Sales trend"
       :subtitle="`Daily completed sales · ${windowLabel}`"
@@ -348,15 +357,36 @@ const orderStatusBars = computed(() =>
       <p v-else-if="!topCustomers.length" class="dashboard-chart-state">
         No completed sales in this range.
       </p>
-      <ol v-else class="dashboard-list">
-        <li v-for="customer in topCustomers" :key="customer.id">
-          <RouterLink
-            v-if="hasPermission(PERMISSION.CUSTOMER_VIEW)"
+      <ol v-else class="top-customers">
+        <li v-for="(customer, index) in topCustomers" :key="customer.id">
+          <component
+            :is="hasPermission(PERMISSION.CUSTOMER_VIEW) ? 'RouterLink' : 'div'"
             :to="{ name: 'customer-details', params: { id: customer.id } }"
-            >{{ customer.name }}</RouterLink
+            class="top-customers__row"
           >
-          <span v-else>{{ customer.name }}</span>
-          <strong>{{ formatCurrency(customer.total) }}</strong>
+            <span class="top-customers__rank" :class="{ 'top-customers__rank--top': index < 3 }">{{
+              index + 1
+            }}</span>
+            <span class="top-customers__avatar" aria-hidden="true">{{
+              getInitials(customer.name)
+            }}</span>
+            <span class="top-customers__body">
+              <span class="top-customers__line">
+                <span class="top-customers__name">{{ customer.name }}</span>
+                <strong>{{ formatCurrency(customer.total) }}</strong>
+              </span>
+              <span class="top-customers__line top-customers__meta">
+                <span
+                  class="top-customers__bar"
+                  role="img"
+                  :aria-label="`${formatShare(customer.share)} of completed sales`"
+                >
+                  <span :style="{ width: `${Math.max(customer.share * 100, 2)}%` }"></span>
+                </span>
+                <span>{{ formatShare(customer.share) }}</span>
+              </span>
+            </span>
+          </component>
         </li>
       </ol>
     </DashboardSection>
@@ -455,6 +485,109 @@ const orderStatusBars = computed(() =>
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .dashboard-charts--sales {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.top-customers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.top-customers__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.top-customers__row:hover {
+  background: var(--color-interactive-default-opacity-10);
+}
+
+a.top-customers__row:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+.top-customers__rank {
+  flex: 0 0 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.top-customers__rank--top {
+  color: var(--color-interactive-default);
+  font-weight: var(--font-weight-semibold);
+}
+
+.top-customers__avatar {
+  display: inline-flex;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-interactive-default-opacity-10);
+  color: var(--color-interactive-default);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.top-customers__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.top-customers__line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.top-customers__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+}
+
+.top-customers__meta {
+  justify-content: flex-start;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.top-customers__bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border-subtle);
+  overflow: hidden;
+}
+
+.top-customers__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-interactive-default);
 }
 
 .dashboard-charts__wide {

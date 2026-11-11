@@ -154,7 +154,10 @@ export function calculateTopCustomers(orders, periods) {
     current.total += order.grandTotal
     totals.set(order.customerId, current)
   }
-  return [...totals.values()]
+  const customers = [...totals.values()]
+  const grandTotal = customers.reduce((sum, customer) => sum + customer.total, 0)
+  return customers
     .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name))
     .slice(0, 5)
+    .map((customer) => ({ ...customer, share: grandTotal ? customer.total / grandTotal : 0 }))
 }
