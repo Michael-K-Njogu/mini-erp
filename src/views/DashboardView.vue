@@ -10,6 +10,7 @@ import { usePermissions } from '../composables/usePermissions'
 import { PERMISSION } from '../constants/permissions'
 import { useToast } from '../composables/useToast'
 import { getDisplayName } from '../utils/profile'
+import { ShoppingCart, UserPlus } from '@lucide/vue'
 import Alert from '../components/Alert.vue'
 import KpiCard from '../components/dashboard/KpiCard.vue'
 import DashboardSection from '../components/dashboard/DashboardSection.vue'
@@ -185,6 +186,30 @@ const getInitials = (name) =>
     .join('')
 const formatShare = (share) => `${(share * 100).toFixed(share > 0 && share < 0.1 ? 1 : 0)}%`
 
+const canOpenActivity = (item) =>
+  hasPermission(item.type === 'order' ? PERMISSION.ORDER_VIEW : PERMISSION.CUSTOMER_VIEW)
+const formatTime = (value) =>
+  new Intl.DateTimeFormat('en-KE', { timeStyle: 'short' }).format(new Date(value))
+const activityGroups = computed(() => {
+  const today = new Date().toDateString()
+  const yesterday = new Date(Date.now() - 86400000).toDateString()
+  const groups = new Map()
+  for (const item of activity.value) {
+    const day = new Date(item.date).toDateString()
+    if (!groups.has(day)) {
+      const label =
+        day === today
+          ? 'Today'
+          : day === yesterday
+            ? 'Yesterday'
+            : new Intl.DateTimeFormat('en-KE', { dateStyle: 'medium' }).format(new Date(item.date))
+      groups.set(day, { key: day, label, items: [] })
+    }
+    groups.get(day).items.push(item)
+  }
+  return [...groups.values()]
+})
+
 const tabs = computed(() => {
   const canViewOrders = hasPermission(PERMISSION.ORDER_VIEW)
   return [
@@ -247,37 +272,46 @@ const orderStatusBars = computed(() =>
   <h1>Welcome back, {{ displayName }}</h1>
 
   <form class="dashboard-filters" @submit.prevent="applyRange">
-    <div>
-      <label for="dashboard-range">Date range</label>
-      <select id="dashboard-range" v-model="preset" :disabled="loading">
-        <option value="7">Last 7 days</option>
-        <option value="30">Last 30 days</option>
-        <option value="90">Last 90 days</option>
-        <option value="custom">Custom range</option>
-      </select>
+    <div class="dashboard-filter-range">
+      <div>
+        <label for="dashboard-range">Date range</label>
+        <select id="dashboard-range" v-model="preset" :disabled="loading">
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="custom">Custom range</option>
+        </select>
+      </div>
+      <template v-if="preset === 'custom'">
+        <div>
+          <label for="dashboard-start">Start date</label>
+          <input
+            id="dashboard-start"
+            v-model="startDate"
+            type="date"
+            :disabled="loading"
+            required
+          />
+        </div>
+        <div>
+          <label for="dashboard-end">End date</label>
+          <input id="dashboard-end" v-model="endDate" type="date" :disabled="loading" required />
+        </div>
+      </template>
     </div>
-    <template v-if="preset === 'custom'">
-      <div>
-        <label for="dashboard-start">Start date</label>
-        <input id="dashboard-start" v-model="startDate" type="date" :disabled="loading" required />
-      </div>
-      <div>
-        <label for="dashboard-end">End date</label>
-        <input id="dashboard-end" v-model="endDate" type="date" :disabled="loading" required />
-      </div>
-    </template>
-    <BaseButton label="Apply" type="submit" :disabled="loading" />
-    <BaseButton
-      v-if="hasPermission(PERMISSION.ORDER_VIEW)"
-      label="Export orders CSV"
-      variant="secondary"
-      :disabled="loading || !!error"
-      @click="exportOrders"
-    />
+    <div class="dashboard-filter-export">
+      <BaseButton label="Apply" type="submit" :disabled="loading" />
+      <BaseButton
+        v-if="hasPermission(PERMISSION.ORDER_VIEW)"
+        label="Export orders CSV"
+        variant="secondary"
+        :disabled="loading || !!error"
+        @click="exportOrders"
+      />
+    </div>
     <p v-if="dateError" class="invalid" role="alert">{{ dateError }}</p>
   </form>
 
-  <p>Selected range: {{ windowLabel }}. Open orders and stock health are current snapshots.</p>
   <Alert v-if="error" type="danger" :message="error" />
 
   <div v-if="!error || loading" class="dashboard-kpis">
@@ -400,31 +434,43 @@ const orderStatusBars = computed(() =>
       <p v-if="loading" class="dashboard-chart-state" role="status">Loading activity...</p>
       <p v-else-if="error" class="dashboard-chart-state">Activity is unavailable.</p>
       <p v-else-if="!activity.length" class="dashboard-chart-state">No activity in this range.</p>
-      <ul v-else class="dashboard-list">
-        <li v-for="item in activity" :key="`${item.type}-${item.id}`">
-          <div>
-            <RouterLink
-              v-if="
-                hasPermission(
-                  item.type === 'order' ? PERMISSION.ORDER_VIEW : PERMISSION.CUSTOMER_VIEW,
-                )
-              "
-              :to="{
-                name: item.type === 'order' ? 'order-details' : 'customer-details',
-                params: { id: item.id },
-              }"
-              >{{ item.title }}</RouterLink
-            >
-            <span v-else>{{ item.title }}</span>
-            <span class="activity-detail">{{
-              item.type === 'order'
-                ? `Order created${item.detail ? ` · ${item.detail}` : ''}`
-                : item.detail
-            }}</span>
-          </div>
-          <time :datetime="item.date">{{ formatDate(item.date) }}</time>
-        </li>
-      </ul>
+      <div v-else class="activity-feed">
+        <section v-for="group in activityGroups" :key="group.key" class="activity-group">
+          <h3 class="activity-group__label">{{ group.label }}</h3>
+          <ul class="activity-group__list">
+            <li v-for="item in group.items" :key="`${item.type}-${item.id}`">
+              <component
+                :is="canOpenActivity(item) ? 'RouterLink' : 'div'"
+                :to="{
+                  name: item.type === 'order' ? 'order-details' : 'customer-details',
+                  params: { id: item.id },
+                }"
+                class="activity-item"
+              >
+                <span
+                  class="activity-item__icon"
+                  :class="`activity-item__icon--${item.type}`"
+                  aria-hidden="true"
+                >
+                  <ShoppingCart v-if="item.type === 'order'" :size="16" />
+                  <UserPlus v-else :size="16" />
+                </span>
+                <span class="activity-item__body">
+                  <span class="activity-item__title">{{ item.title }}</span>
+                  <span class="activity-detail">{{
+                    item.type === 'order'
+                      ? `Order created${item.detail ? ` · ${item.detail}` : ''}`
+                      : item.detail
+                  }}</span>
+                </span>
+                <time :datetime="item.date" :title="formatDate(item.date)">{{
+                  formatTime(item.date)
+                }}</time>
+              </component>
+            </li>
+          </ul>
+        </section>
+      </div>
     </DashboardSection>
   </div>
 </template>
@@ -434,6 +480,7 @@ const orderStatusBars = computed(() =>
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
+  justify-content: space-between;
   gap: var(--space-3);
 }
 
@@ -447,32 +494,100 @@ const orderStatusBars = computed(() =>
   flex-basis: 100%;
 }
 
-.dashboard-list {
+.dashboard-filter-export,
+.dashboard-filter-range {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.activity-detail {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.activity-feed {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
+}
+
+.activity-group__label {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.activity-group__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.dashboard-list li {
+.activity-item {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: var(--space-3);
-  flex-wrap: wrap;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  text-decoration: none;
 }
 
-.activity-detail {
-  display: block;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+a.activity-item:hover {
+  background: var(--color-interactive-default-opacity-10);
 }
 
-.dashboard-list time {
-  color: var(--color-text-secondary);
+a.activity-item:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+.activity-item__icon {
+  display: inline-flex;
+  flex: 0 0 36px;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.activity-item__icon--order {
+  background: var(--color-interactive-default-opacity-10);
+  color: var(--color-interactive-default);
+}
+
+.activity-item__icon--customer {
+  background: var(--color-feedback-success-subtle);
+  color: var(--color-feedback-success);
+}
+
+.activity-item__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.activity-item__title {
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.activity-item time {
+  flex: 0 0 auto;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 .dashboard-kpis {
