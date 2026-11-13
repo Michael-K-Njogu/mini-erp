@@ -2,7 +2,7 @@
 
 This is a Mini ERP for managing the day-to-day operations of any business. It brings customer, product, and sales-order workflows together, with role-aware access, account credit calculations, and invoice previews.
 
-Try the [live demo](https://mikes-mini-erp-demo.netlify.app/).
+Try the [live demo](https://mini-erp-pink.vercel.app/).
 
 The application is being built out as an operational hub. Its current workflows
 are backed by Supabase, while reporting, invoicing and payments, and deeper
@@ -138,6 +138,34 @@ unreferenced object that requires administrator cleanup through the Storage API.
 so deep links work. Vite embeds `VITE_*` values at build time, so each Netlify site
 targets one Supabase project: create one site with the demo project's variables
 (`VITE_ENABLE_DEMO=true`) and, if wanted, a second site with the main project's.
+
+## Deploying the demo on Vercel
+
+Import `Michael-K-Njogu/mini-erp` into a separate Vercel project for the demo.
+Use the repository root, the Vite framework preset, `npm run build` as the build
+command, and `dist` as the output directory. `vercel.json` configures these defaults
+and rewrites client-side routes to `index.html` so refreshing a detail page works.
+
+Before deploying, add these variables in Vercel Project Settings → Environment
+Variables for Production and Preview:
+
+| Variable                 | Value                                                         |
+| ------------------------ | ------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`      | Copy the demo project URL from your local `.env.demo`         |
+| `VITE_SUPABASE_ANON_KEY` | Copy the demo project's publishable/anon key from `.env.demo` |
+| `VITE_ENABLE_DEMO`       | `true`                                                        |
+| `VITE_USE_MSW`           | `false`                                                       |
+
+The local `.env` and `.env.demo` files are git-ignored and are not included in Git
+deployments. Use `npm run build` on Vercel: its configured environment variables
+supply the demo settings without needing `.env.demo`. Keep the main deployment in
+a separate Vercel project with its own Supabase variables. Changes to build-time
+variables require a new deployment.
+
+The demo Supabase project must have anonymous sign-ins enabled and its migrations
+applied before visitors can use it. After deploying, check **Try the demo**, seeded
+products and customers, a detail-page refresh, and **Reset data**. If using email
+or OAuth sign-in, add the Vercel domain to the demo Supabase Auth URL configuration.
 
 ## Product Tour
 
