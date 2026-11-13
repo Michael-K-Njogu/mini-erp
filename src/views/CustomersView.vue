@@ -16,6 +16,7 @@ import BaseSelect from '../components/base/BaseSelect.vue'
 import BasePagination from '../components/base/BasePagination.vue'
 import BaseButton from '../components/base/BaseButton.vue'
 import SortableHeader from '../components/base/SortableHeader.vue'
+import CustomerImage from '../components/customers/CustomerImage.vue'
 import CustomerTableSkeleton from '../components/customers/CustomerTableSkeleton.vue'
 import BaseEmptyState from '../components/base/BaseEmptyState.vue'
 
@@ -160,7 +161,12 @@ const emptyState = computed(() => {
           @click="viewCustomer(customer.id)"
           class="clickable-row"
         >
-          <td>{{ customer.name }}</td>
+          <td>
+            <div class="customer-name-cell">
+              <CustomerImage :src="customer.image" :name="customer.name" />
+              <span>{{ customer.name }}</span>
+            </div>
+          </td>
           <td>{{ customer.customerNumber || '—' }}</td>
           <td>{{ customer.email }}</td>
           <td>{{ formatCurrency(customer.creditLimit) }}</td>
@@ -210,3 +216,11 @@ const emptyState = computed(() => {
     </template>
   </BaseEmptyState>
 </template>
+
+<style scoped>
+.customer-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+</style>

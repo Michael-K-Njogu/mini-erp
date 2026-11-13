@@ -89,15 +89,17 @@ const fields = {
         <Info />
       </template>
       <template #content>
-        <BaseImageUpload
-          v-model="image"
-          label="Product image (optional)"
-          :disabled="loading"
-          :upload-disabled="isDemo"
-        />
-        <p v-if="isDemo" class="image-upload-hint">
-          Product image uploads are unavailable in demo accounts.
-        </p>
+        <div class="form-group">
+          <BaseImageUpload
+            v-model="image"
+            label="Product image (optional)"
+            :disabled="loading"
+            :upload-disabled="isDemo"
+          />
+          <p v-if="isDemo" class="image-upload-hint">
+            Product image uploads are unavailable in demo accounts.
+          </p>
+        </div>
         <div class="form-grid">
           <div class="form-group">
             <BaseTextInput
