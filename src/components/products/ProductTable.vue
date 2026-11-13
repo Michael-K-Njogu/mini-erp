@@ -90,7 +90,12 @@ function showProductUnit(product) {
     </thead>
 
     <tbody>
-      <tr v-for="product in products" :key="product.id">
+      <tr
+        class="clickable-row"
+        v-for="product in products"
+        :key="product.id"
+        @click="$emit('view', product.id)"
+      >
         <td>
           <div class="product-name-cell">
             <ProductImage :src="product.image" :name="product.name" /><span>{{
@@ -108,7 +113,7 @@ function showProductUnit(product) {
           </BaseBadge>
         </td>
         <td>{{ formatDate(product.createdAt) }}</td>
-        <td class="product-actions-cell">
+        <td class="product-actions-cell" @click.stop>
           <div class="row-actions">
             <BaseButton
               :aria-label="`View ${product.name}`"

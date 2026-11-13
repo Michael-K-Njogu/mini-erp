@@ -91,7 +91,12 @@ function getOrderStatusVariant(status) {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="order in orders" :key="order.id">
+      <tr
+        class="clickable-row"
+        v-for="order in orders"
+        :key="order.id"
+        @click="$emit('view', order.id)"
+      >
         <td>
           {{ order.orderNumber }}
           <span v-if="order.notes" class="notes-icon" :title="order.notes">
@@ -106,7 +111,7 @@ function getOrderStatusVariant(status) {
             {{ order.status }}
           </BaseBadge>
         </td>
-        <td class="row-actions">
+        <td class="row-actions" @click.stop>
           <BaseButton
             variant="secondary"
             size="sm"
