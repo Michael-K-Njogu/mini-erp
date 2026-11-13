@@ -58,8 +58,8 @@ function showProductUnit(product) {
   <table class="data-table">
     <thead>
       <tr>
-        <SortableHeader label="SKU" field="sku" :sort="sort" @sort="emit('sort', $event)" />
         <SortableHeader label="Product" field="name" :sort="sort" @sort="emit('sort', $event)" />
+        <SortableHeader label="SKU" field="sku" :sort="sort" @sort="emit('sort', $event)" />
         <SortableHeader
           label="Category"
           field="category"
@@ -108,50 +108,52 @@ function showProductUnit(product) {
           </BaseBadge>
         </td>
         <td>{{ formatDate(product.createdAt) }}</td>
-        <td class="row-actions">
-          <BaseButton
-            :aria-label="`View ${product.name}`"
-            :title="`View ${product.name}`"
-            size="sm"
-            variant="secondary"
-            class="btn-icon"
-            @click="$emit('view', product.id)"
-            title="View Product"
-          >
-            <template #icon>
-              <Eye size="16" />
-            </template>
-          </BaseButton>
+        <td class="product-actions-cell">
+          <div class="row-actions">
+            <BaseButton
+              :aria-label="`View ${product.name}`"
+              :title="`View ${product.name}`"
+              size="sm"
+              variant="secondary"
+              class="btn-icon"
+              @click="$emit('view', product.id)"
+              title="View Product"
+            >
+              <template #icon>
+                <Eye size="16" />
+              </template>
+            </BaseButton>
 
-          <BaseButton
-            v-if="canEdit"
-            :aria-label="`Edit ${product.name}`"
-            :title="`Edit ${product.name}`"
-            size="sm"
-            variant="secondary"
-            class="btn-icon"
-            @click="$emit('edit', product.id)"
-            title="Edit Product"
-          >
-            <template #icon>
-              <SquarePen size="16" />
-            </template>
-          </BaseButton>
+            <BaseButton
+              v-if="canEdit"
+              :aria-label="`Edit ${product.name}`"
+              :title="`Edit ${product.name}`"
+              size="sm"
+              variant="secondary"
+              class="btn-icon"
+              @click="$emit('edit', product.id)"
+              title="Edit Product"
+            >
+              <template #icon>
+                <SquarePen size="16" />
+              </template>
+            </BaseButton>
 
-          <BaseButton
-            v-if="canDelete"
-            :aria-label="`Delete ${product.name}`"
-            :title="`Delete ${product.name}`"
-            size="sm"
-            variant="danger"
-            class="btn-icon"
-            @click="$emit('delete', product)"
-            title="Delete Product"
-          >
-            <template #icon>
-              <Trash2 size="16" />
-            </template>
-          </BaseButton>
+            <BaseButton
+              v-if="canDelete"
+              :aria-label="`Delete ${product.name}`"
+              :title="`Delete ${product.name}`"
+              size="sm"
+              variant="danger"
+              class="btn-icon"
+              @click="$emit('delete', product)"
+              title="Delete Product"
+            >
+              <template #icon>
+                <Trash2 size="16" />
+              </template>
+            </BaseButton>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -163,5 +165,13 @@ function showProductUnit(product) {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+.product-actions-cell {
+  vertical-align: middle;
+}
+
+.product-actions-cell .row-actions {
+  align-items: center;
+  flex-wrap: nowrap;
 }
 </style>
