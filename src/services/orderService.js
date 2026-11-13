@@ -155,6 +155,34 @@ export async function createOrder(order) {
   return mapOrder(data[0])
 }
 
+export async function saveOrderWithItems({ id = null, customerId, notes, items, post }) {
+  const data = await apiClient.post(
+    '/rpc/save_order_with_items',
+    {
+      p_order_id: id,
+      p_order_number: id ? null : generateOrderNumber(),
+      p_customer_id: customerId,
+      p_notes: notes || null,
+      p_items: items.map((item) => ({
+        id: item.isTemporary ? null : item.id || null,
+        product_id: item.productId,
+        sku: item.sku,
+        product_name: item.productName,
+        unit: item.unit,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+        discount: item.discount ?? 0,
+        line_total: item.lineTotal,
+        notes: item.notes || null,
+      })),
+      p_post: post,
+    },
+    { headers: { Accept: 'application/vnd.pgrst.object+json' } },
+  )
+
+  return mapOrder(data)
+}
+
 export async function updateOrder(id, order) {
   const apiOrder = mapOrderToApi(order)
 

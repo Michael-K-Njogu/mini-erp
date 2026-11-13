@@ -52,7 +52,7 @@ const mountLayout = async () => {
 beforeEach(() => {
   vi.resetAllMocks()
   user.value = { id: 'user-1' }
-  permissions.value = [PERMISSION.CUSTOMER_VIEW]
+  permissions.value = [PERMISSION.CUSTOMER_VIEW, PERMISSION.INVENTORY_VIEW]
   getCompletion.mockResolvedValue(0)
   completeTour.mockResolvedValue()
   vi.stubGlobal('matchMedia', () => ({
@@ -68,6 +68,17 @@ afterEach(() => {
 })
 
 describe('product tour integration', () => {
+  it('omits inventory when the user cannot view it', async () => {
+    permissions.value = [PERMISSION.CUSTOMER_VIEW]
+    await mountLayout()
+    expect(
+      wrapper
+        .getComponent(ProductTour)
+        .props('steps')
+        .map((step) => step.title),
+    ).not.toContain('Inventory')
+  })
+
   it('starts for an unseen account and includes only permitted pages', async () => {
     await mountLayout()
     const tour = wrapper.getComponent(ProductTour)

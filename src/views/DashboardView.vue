@@ -171,7 +171,7 @@ const cards = computed(() => {
     },
   ]
   return result.filter((card) => {
-    if (['low', 'out'].includes(card.key)) return true
+    if (['low', 'out'].includes(card.key)) return hasPermission(PERMISSION.INVENTORY_VIEW)
     if (card.key === 'new-customers') return hasPermission(PERMISSION.CUSTOMER_VIEW)
     return hasPermission(PERMISSION.ORDER_VIEW)
   })
@@ -215,7 +215,11 @@ const tabs = computed(() => {
   return [
     canViewOrders && { value: 'sales', label: 'Sales', panelId: 'dashboard-tabs-panel-sales' },
     canViewOrders && { value: 'orders', label: 'Orders', panelId: 'dashboard-tabs-panel-orders' },
-    { value: 'inventory', label: 'Inventory', panelId: 'dashboard-tabs-panel-inventory' },
+    hasPermission(PERMISSION.INVENTORY_VIEW) && {
+      value: 'inventory',
+      label: 'Inventory',
+      panelId: 'dashboard-tabs-panel-inventory',
+    },
     (canViewOrders || hasPermission(PERMISSION.CUSTOMER_VIEW)) && {
       value: 'activity',
       label: 'Activity',
@@ -225,7 +229,7 @@ const tabs = computed(() => {
 })
 const activeTab = ref('sales')
 const currentTab = computed(
-  () => tabs.value.find((tab) => tab.value === activeTab.value)?.value ?? tabs.value[0].value,
+  () => tabs.value.find((tab) => tab.value === activeTab.value)?.value ?? tabs.value[0]?.value,
 )
 
 const openOrderBars = computed(() => [
@@ -328,6 +332,7 @@ const orderStatusBars = computed(() =>
   </div>
 
   <BaseNavTab
+    v-if="tabs.length"
     id="dashboard-tabs"
     v-model="activeTab"
     aria-label="Dashboard details"
@@ -335,6 +340,7 @@ const orderStatusBars = computed(() =>
   />
 
   <div
+    v-if="currentTab"
     :id="`dashboard-tabs-panel-${currentTab}`"
     class="dashboard-charts"
     :class="{ 'dashboard-charts--sales': currentTab === 'sales' }"

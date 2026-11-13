@@ -28,7 +28,11 @@ defineProps({
 </script>
 
 <template>
-  <button :type="type" :class="`btn btn-${variant} btn-${size}`">
+  <button
+    :type="type"
+    :class="`btn btn-${variant} btn-${size}`"
+    :aria-label="ariaLabel || undefined"
+  >
     <slot name="icon" />
     <span>{{ label }}</span>
   </button>

@@ -1,4 +1,5 @@
 import { apiClient } from '../api/apiClient'
+import { getAll } from './paginatedService'
 
 const INVENTORY_FIELDS = `
   id,
@@ -40,58 +41,10 @@ function mapInventoryItem(item) {
 export async function getInventory({ query = '', status = '' } = {}) {
   const params = new URLSearchParams()
 
-  params.set(
-    'select',
-    'id,product_id,quantity_on_hand,quantity_reserved,reorder_level,created_at,updated_at',
-  )
-  params.set('order', 'created_at.desc')
-
-  const inventoryData = await apiClient.get(`/inventory?${params.toString()}`)
-
-  if (!inventoryData.length) {
-    return []
-  }
-
-  // Get the product IDs referenced by inventory
-  const productIds = [...new Set(inventoryData.map((item) => item.product_id).filter(Boolean))]
-
-  let products = []
-
-  if (productIds.length) {
-    const productParams = new URLSearchParams()
-
-    productParams.set('select', 'id,name,sku')
-    productParams.set('id', `in.(${productIds.join(',')})`)
-
-    products = await apiClient.get(`/products?${productParams.toString()}`)
-  }
-
-  // Create a quick lookup by product ID
-  const productsById = new Map(products.map((product) => [product.id, product]))
-
-  let inventory = inventoryData.map((item) => {
-    const product = productsById.get(item.product_id)
-
-    return {
-      id: item.id,
-      productId: item.product_id,
-
-      product: product
-        ? {
-            id: product.id,
-            name: product.name,
-            sku: product.sku,
-          }
-        : null,
-
-      quantityOnHand: Number(item.quantity_on_hand ?? 0),
-      quantityReserved: Number(item.quantity_reserved ?? 0),
-      reorderLevel: Number(item.reorder_level ?? 0),
-
-      createdAt: item.created_at,
-      updatedAt: item.updated_at,
-    }
-  })
+  params.set('select', INVENTORY_FIELDS)
+  params.set('order', 'id.asc')
+  const inventoryData = await getAll('inventory', params)
+  let inventory = inventoryData.map(mapInventoryItem)
 
   if (query) {
     const normalizedQuery = query.toLowerCase()

@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   getInventoryItem: vi.fn(),
   getStockMovements: vi.fn(),
   adjustStock: vi.fn(),
+  hasPermission: vi.fn(),
 }))
 vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { id: 'inventory-1' } }),
@@ -18,9 +19,13 @@ vi.mock('../services/inventoryService', () => ({
   adjustStock: mocks.adjustStock,
 }))
 vi.mock('../services/stockMovementService', () => ({ getStockMovements: mocks.getStockMovements }))
+vi.mock('../composables/usePermissions', () => ({
+  usePermissions: () => ({ hasPermission: mocks.hasPermission }),
+}))
 
 beforeEach(() => {
   vi.resetAllMocks()
+  mocks.hasPermission.mockReturnValue(true)
   mocks.getInventoryItem.mockResolvedValue({
     productId: 'product-1',
     product: { name: 'Cement', sku: 'C-1' },
@@ -32,6 +37,34 @@ beforeEach(() => {
 })
 
 describe('stock adjustment on inventory detail', () => {
+  it('reports movement loading failures instead of showing an empty history', async () => {
+    mocks.getStockMovements.mockRejectedValue(new Error('History unavailable'))
+    const toolbar = document.createElement('div')
+    toolbar.id = 'page-toolbar-root'
+    document.body.append(toolbar)
+    const wrapper = mount(InventoryDetailView, { attachTo: document.body })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('History unavailable')
+    expect(wrapper.text()).not.toContain('No stock movements recorded yet.')
+    wrapper.unmount()
+    toolbar.remove()
+  })
+
+  it('hides stock adjustment when the user lacks permission', async () => {
+    mocks.hasPermission.mockReturnValue(false)
+    const toolbar = document.createElement('div')
+    toolbar.id = 'page-toolbar-root'
+    document.body.append(toolbar)
+    const wrapper = mount(InventoryDetailView, { attachTo: document.body })
+    await flushPromises()
+
+    expect(toolbar.textContent).not.toContain('Adjust Stock')
+    expect(document.querySelector('[role="dialog"]')).toBeNull()
+    wrapper.unmount()
+    toolbar.remove()
+  })
+
   it('displays errors in the modal and clears them when reopened', async () => {
     mocks.adjustStock.mockRejectedValue(new Error('Adjustment failed'))
     const toolbar = document.createElement('div')

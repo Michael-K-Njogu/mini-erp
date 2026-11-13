@@ -4,16 +4,12 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { ORDER_STATUS } from '../constants/orderStatuses.js'
 
-import { calculateGrandTotal } from '../business/orderCalculations.js'
 import { canEditOrder } from '../business/orderPermissions.js'
 
 import { updateOrderSchema } from '../validation/orderSchema.js'
 
 import { useToast } from '../composables/useToast'
-import { useOrder } from '../composables/useOrder'
-import { useOrderItems } from '../composables/useOrderItems'
-import { getOrderById } from '../services/orderService'
-import { updateOrder } from '../services/orderService'
+import { getOrderById, saveOrderWithItems } from '../services/orderService'
 import { getOrderItemsByOrder } from '../services/orderItemService'
 import { getCustomers, getCustomerAccountSummary } from '../services/customerService'
 
@@ -25,13 +21,10 @@ const { success, error: showError } = useToast()
 const customerOptions = ref([])
 const order = ref(null)
 const orderItems = ref([])
-const originalOrderItems = ref([])
 const loading = ref(true)
 const saving = ref(false)
 const customerAccount = ref(null)
 const loadingCustomerAccount = ref(false)
-
-const { addOrderItem, saveOrderItem, removeOrderItem } = useOrderItems()
 
 async function loadCustomerAccount(customerId) {
   customerAccount.value = null
@@ -81,10 +74,6 @@ async function loadOrder() {
     const items = await getOrderItemsByOrder(order.value.id)
 
     orderItems.value = items
-
-    originalOrderItems.value = items.map((item) => ({
-      ...item,
-    }))
   } catch (err) {
     console.error(err)
     showError(err.message)
@@ -93,75 +82,18 @@ async function loadOrder() {
   }
 }
 
-async function saveOrderItems(items) {
-  const originalItemsById = new Map(originalOrderItems.value.map((item) => [item.id, item]))
-
-  const currentItemIds = new Set(items.filter((item) => !item.isTemporary).map((item) => item.id))
-
-  // 1. Delete items that existed originally but
-  // are no longer present in the form.
-  for (const originalItem of originalOrderItems.value) {
-    if (!currentItemIds.has(originalItem.id)) {
-      await removeOrderItem(originalItem.id)
-    }
-  }
-
-  // 2. Create new items or update existing items.
-  for (const item of items) {
-    // New item
-    if (item.isTemporary) {
-      const { id, isTemporary, ...itemData } = item
-
-      await addOrderItem({
-        ...itemData,
-        orderId: order.value.id,
-      })
-
-      continue
-    }
-
-    const originalItem = originalItemsById.get(item.id)
-
-    if (!originalItem) {
-      continue
-    }
-
-    // Existing item — check whether anything changed
-    const hasChanged =
-      Number(item.quantity) !== Number(originalItem.quantity) ||
-      Number(item.discount || 0) !== Number(originalItem.discount || 0) ||
-      Number(item.lineTotal || 0) !== Number(originalItem.lineTotal || 0)
-
-    if (hasChanged) {
-      await saveOrderItem(item.id, {
-        quantity: item.quantity,
-        discount: item.discount,
-        lineTotal: item.lineTotal,
-      })
-    }
-  }
-} // end of saveOrderItems
-
 async function saveOrder(values, status) {
+  if (saving.value) return
   saving.value = true
 
   try {
     const { orderItems: items = [], ...orderValues } = values
 
-    await updateOrder(order.value.id, {
+    await saveOrderWithItems({
+      id: order.value.id,
       ...orderValues,
-      status,
-      ...(status === ORDER_STATUS.PENDING ? { postedAt: new Date().toISOString() } : {}),
-    })
-
-    await saveOrderItems(items)
-
-    const allOrderItems = await getOrderItemsByOrder(order.value.id)
-
-    const grandTotal = calculateGrandTotal(allOrderItems)
-
-    await updateOrder(order.value.id, {
-      totalAmount: grandTotal,
+      items,
+      post: status === ORDER_STATUS.PENDING,
     })
 
     success(

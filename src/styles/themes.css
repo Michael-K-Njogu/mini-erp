@@ -11,7 +11,6 @@
   /* Tokens that do not change between themes */
   --color-bg-overlay: #101114;
   --color-bg-overlay-light: rgb(255 255 255 / 60%);
-  --color-bg-scrim: rgb(0 0 0 / 60%);
   --color-bg-transparent: rgb(255 255 255 / 0%);
   --color-brand-dds: #328c98;
   --color-brand-dds-mark: #32929c;
@@ -40,6 +39,7 @@
   --color-bg-inverse-opacity-0: rgb(23 23 23 / 0%);
   --color-bg-inverse-opacity-10: rgb(23 23 23 / 10%);
   --color-bg-inverse-opacity-8: rgb(23 23 23 / 8%);
+  --color-bg-scrim: rgb(255 255 255 / 60%);
   --color-bg-subtle: #e5e5e5;
   --color-border-default: #d4d4d4;
   --color-border-focus: rgb(47 94 175 / 50%);
@@ -79,6 +79,8 @@
   --color-feedback-warning: #975102;
   --color-feedback-warning-subtle: #fffbeb;
   --color-icon-default: #404040;
+  /* SVG background images cannot inherit currentColor; keep the stroke in sync with the icon token. */
+  --icon-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23404040' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --color-icon-inverse: #ffffff;
   --color-icon-muted: #525252;
   --color-interactive-danger-hover: #991b1b;
@@ -107,6 +109,7 @@
   --color-bg-inverse-opacity-0: rgb(247 247 247 / 0%);
   --color-bg-inverse-opacity-10: rgb(247 247 247 / 10%);
   --color-bg-inverse-opacity-8: rgb(247 247 247 / 8%);
+  --color-bg-scrim: rgb(0 0 0 / 60%);
   --color-bg-subtle: #171717;
   --color-border-default: #404040;
   --color-border-focus: rgb(130 166 221 / 50%);
@@ -146,6 +149,7 @@
   --color-feedback-warning: #ffe8a3;
   --color-feedback-warning-subtle: #594318;
   --color-icon-default: #e5e5e5;
+  --icon-select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e5e5e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --color-icon-inverse: #171717;
   --color-icon-muted: #a3a3a3;
   --color-interactive-danger-hover: #fee2e2;

@@ -40,6 +40,7 @@ export const navigation = [
     title: 'Inventory',
     icon: Warehouse,
     to: '/inventory',
+    permission: PERMISSION.INVENTORY_VIEW,
   },
   /*
   {

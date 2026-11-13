@@ -23,6 +23,10 @@ export const PERMISSION = {
   PRODUCT_EDIT: 'product:edit',
   PRODUCT_DELETE: 'product:delete',
 
+  // Inventory
+  INVENTORY_VIEW: 'inventory:view',
+  INVENTORY_ADJUST: 'inventory:adjust',
+
   // Users
   USER_VIEW: 'user:view',
   USER_MANAGE: 'user:manage',

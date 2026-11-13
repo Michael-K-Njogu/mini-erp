@@ -4,17 +4,27 @@ import { useRouter } from 'vue-router'
 
 import InventoryTable from '../components/inventory/InventoryTable.vue'
 import InventoryTableSkeleton from '../components/inventory/InventoryTableSkeleton.vue'
+import BaseSearchInput from '../components/base/BaseSearchInput.vue'
+import BaseSelect from '../components/base/BaseSelect.vue'
+import BaseButton from '../components/base/BaseButton.vue'
 import PageToolbar from '../layouts/PageToolbar.vue'
+import { RefreshCw } from '@lucide/vue'
 import { useSorting } from '../composables/useSorting'
 import { getInventory, getStockStatus, getAvailableQuantity } from '../services/inventoryService'
 
 const router = useRouter()
 const inventory = ref([])
 const loading = ref(false)
+const refreshing = ref(false)
 const error = ref('')
 
 const searchQuery = ref('')
 const statusFilter = ref('')
+const stockStatusOptions = [
+  { value: 'in-stock', label: 'In stock' },
+  { value: 'low-stock', label: 'Low stock' },
+  { value: 'out-of-stock', label: 'Out of stock' },
+]
 
 const filteredInventory = computed(() => {
   let items = inventory.value
@@ -68,6 +78,7 @@ const sortedInventory = computed(() => {
 })
 
 async function loadInventory() {
+  if (loading.value) return
   loading.value = true
   error.value = ''
 
@@ -79,6 +90,16 @@ async function loadInventory() {
     error.value = err.message || 'Unable to load inventory.'
   } finally {
     loading.value = false
+  }
+}
+
+async function handleRefresh() {
+  if (loading.value || refreshing.value) return
+  refreshing.value = true
+  try {
+    await loadInventory()
+  } finally {
+    refreshing.value = false
   }
 }
 
@@ -97,22 +118,35 @@ onMounted(loadInventory)
 <template>
   <div class="inventory-view">
     <PageToolbar>
-      <template #search>
-        <input
+      <template #filters>
+        <BaseSearchInput
           v-model="searchQuery"
-          type="search"
+          aria-label="Search inventory by product name or SKU"
           placeholder="Search products..."
-          class="search-input"
+        />
+        <BaseSelect
+          v-model="statusFilter"
+          id="inventory-stock-level"
+          name="inventory-stock-level"
+          :show-label="false"
+          :options="stockStatusOptions"
+          all-options-selected-text="All stock levels"
+          aria-label="Filter by stock level"
         />
       </template>
-
-      <template #filters>
-        <select v-model="statusFilter" class="filter-select">
-          <option value="">All stock levels</option>
-          <option value="in-stock">In stock</option>
-          <option value="low-stock">Low stock</option>
-          <option value="out-of-stock">Out of stock</option>
-        </select>
+      <template #actions>
+        <BaseButton
+          :aria-label="refreshing ? 'Refreshing...' : 'Refresh'"
+          variant="secondary"
+          :disabled="loading"
+          :class="{ 'is-loading': refreshing }"
+          class="btn-icon toolbar-icon-button"
+          @click="handleRefresh"
+        >
+          <template #icon>
+            <RefreshCw size="20" />
+          </template>
+        </BaseButton>
       </template>
     </PageToolbar>
 

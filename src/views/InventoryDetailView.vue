@@ -6,6 +6,8 @@ import PageToolbar from '../layouts/PageToolbar.vue'
 import BaseBadge from '../components/base/BaseBadge.vue'
 import BaseButton from '../components/base/BaseButton.vue'
 import StockAdjustmentModal from '../components/inventory/StockAdjustmentModal.vue'
+import { usePermissions } from '../composables/usePermissions'
+import { PERMISSION } from '../constants/permissions'
 
 import {
   getInventoryItem,
@@ -17,6 +19,7 @@ import {
 import { getStockMovements } from '../services/stockMovementService'
 
 const showAdjustmentModal = ref(false)
+const { hasPermission } = usePermissions()
 const adjusting = ref(false)
 const adjustmentError = ref('')
 
@@ -28,6 +31,7 @@ const movements = ref([])
 
 const loading = ref(false)
 const movementsLoading = ref(false)
+const movementsError = ref('')
 const error = ref('')
 
 const availableQuantity = computed(() => {
@@ -138,11 +142,13 @@ async function loadMovements() {
   if (!inventory.value?.productId) return
 
   movementsLoading.value = true
+  movementsError.value = ''
 
   try {
     movements.value = await getStockMovements(inventory.value.productId)
   } catch (err) {
     console.error('Failed to load stock movements:', err)
+    movementsError.value = err.message || 'Unable to load stock movements.'
   } finally {
     movementsLoading.value = false
   }
@@ -161,6 +167,7 @@ function goBack() {
 }
 
 function openStockAdjustment() {
+  if (!hasPermission(PERMISSION.INVENTORY_ADJUST)) return
   adjustmentError.value = ''
   showAdjustmentModal.value = true
 }
@@ -203,7 +210,13 @@ onMounted(loadPage)
       <template #actions>
         <BaseButton label="Back to Inventory" size="sm" variant="secondary" @click="goBack" />
 
-        <BaseButton label="Adjust Stock" size="sm" variant="primary" @click="openStockAdjustment" />
+        <BaseButton
+          v-if="hasPermission(PERMISSION.INVENTORY_ADJUST)"
+          label="Adjust Stock"
+          size="sm"
+          variant="primary"
+          @click="openStockAdjustment"
+        />
       </template>
     </PageToolbar>
 
@@ -282,6 +295,10 @@ onMounted(loadPage)
           </div>
 
           <div v-if="movementsLoading" class="state-message">Loading stock movements...</div>
+
+          <div v-else-if="movementsError" class="state-message error" role="alert">
+            {{ movementsError }}
+          </div>
 
           <div v-else-if="!movements.length" class="state-message">
             No stock movements recorded yet.

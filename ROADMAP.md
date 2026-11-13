@@ -31,6 +31,12 @@ building-materials business.
 - [x] Product search, filtering, sorting, and pagination
 - [x] Product form validation and permission checks
 
+### Inventory
+
+- [x] Inventory overview, search, stock adjustments and movement history
+- [x] Product stock synchronization and order reservations, fulfillment, and cancellation
+- [x] Block posting orders that exceed available stock
+
 ### User Experience
 
 - [x] Responsive list, table, card, and detail views
@@ -84,9 +90,8 @@ building-materials business.
 ### Inventory
 
 - [ ] Low-stock thresholds and alerts
-- [ ] Stock adjustments, returns, and movement history
+- [ ] Returns
 - [ ] Reorder suggestions and supplier details
-- [ ] Prevent or warn about orders exceeding available stock
 
 ## Phase 2: CRM Intelligence
 

@@ -4,15 +4,11 @@ import { useRouter } from 'vue-router'
 
 import { ORDER_STATUS } from '../constants/orderStatuses.js'
 
-import { calculateGrandTotal } from '../business/orderCalculations.js'
-
 import { createOrderSchema } from '../validation/orderSchema.js'
 
 import { useToast } from '../composables/useToast'
-import { useOrderItems } from '../composables/useOrderItems'
-
 import { getCustomers, getCustomerAccountSummary } from '../services/customerService'
-import { createOrder, updateOrderGrandTotal } from '../services/orderService'
+import { saveOrderWithItems } from '../services/orderService'
 
 import OrderForm from '../components/orders/OrderForm.vue'
 
@@ -22,8 +18,6 @@ const customerOptions = ref([])
 const customerAccount = ref(null)
 const loadingCustomerAccount = ref(false)
 const saving = ref(false)
-
-const { addOrderItem } = useOrderItems()
 
 async function loadCustomers() {
   try {
@@ -67,39 +61,17 @@ async function loadCustomerAccount(customerId) {
 }
 
 async function saveOrder(values, status) {
+  if (saving.value) return
   saving.value = true
 
   try {
     const { orderItems = [], ...orderValues } = values
 
-    const order = {
+    const createdOrder = await saveOrderWithItems({
       ...orderValues,
-      status,
-    }
-
-    if (status === ORDER_STATUS.PENDING) {
-      order.postedAt = new Date().toISOString()
-    }
-
-    const createdOrder = await createOrder(order)
-
-    for (const item of orderItems) {
-      await addOrderItem({
-        orderId: createdOrder.id,
-        productId: item.productId,
-        sku: item.sku,
-        productName: item.productName,
-        unit: item.unit,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        discount: item.discount,
-        lineTotal: item.lineTotal,
-      })
-    }
-
-    const grandTotal = calculateGrandTotal(orderItems)
-
-    await updateOrderGrandTotal(createdOrder.id, grandTotal)
+      items: orderItems,
+      post: status === ORDER_STATUS.PENDING,
+    })
 
     success(`Order ${createdOrder.orderNumber} created successfully.`)
 

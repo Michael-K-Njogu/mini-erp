@@ -142,10 +142,12 @@ describe('dashboard', () => {
     await flushPromises()
     expect(getOrders).toHaveBeenCalledTimes(1)
     expect(getCustomers).toHaveBeenCalledTimes(1)
-    expect(getInventory).toHaveBeenCalledTimes(2)
+    expect(getInventory).toHaveBeenCalledTimes(1)
     expect(wrapper.text()).not.toContain('Export orders')
     expect(wrapper.text()).not.toContain('Recent activity')
     expect(wrapper.text()).not.toContain('Sales trend')
+    expect(wrapper.text()).not.toContain('Stock health')
+    expect(wrapper.text()).not.toContain('Low-stock items')
     wrapper.unmount()
   })
 

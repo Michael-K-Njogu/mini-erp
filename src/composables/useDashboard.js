@@ -50,7 +50,9 @@ export function useDashboard() {
               signal,
             })
           : Promise.resolve([]),
-        getDashboardInventory({ signal }),
+        hasPermission(PERMISSION.INVENTORY_VIEW)
+          ? getDashboardInventory({ signal })
+          : Promise.resolve([]),
       ])
       if (signal.aborted) return
       periods.value = nextPeriods

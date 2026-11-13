@@ -30,7 +30,7 @@ const baseProductSchema = z.object({
 
   stockQuantity: z
     .number({ invalid_type_error: 'Stock quantity must be a number' })
-    .int({ message: 'Stock quantity must be a whole number' })
+    .finite({ message: 'Stock quantity must be finite' })
     .nonnegative({ message: 'Stock quantity cannot be negative' }),
 
   status: z.string().trim().min(1, { message: 'Please select a status from the list' }),

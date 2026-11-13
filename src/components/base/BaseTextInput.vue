@@ -42,6 +42,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  step: {
+    type: [String, Number],
+    default: undefined,
+  },
   ariaInvalid: {
     type: Boolean,
     default: false,
@@ -76,6 +80,7 @@ function handleInput(event) {
       :value="modelValue"
       :autocomplete="autocomplete"
       :disabled="disabled"
+      :step="step"
       :aria-invalid="ariaInvalid || undefined"
       :aria-describedby="ariaDescribedby"
       @input="handleInput"

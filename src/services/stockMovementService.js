@@ -1,4 +1,4 @@
-import { apiClient } from '../api/apiClient'
+import { getAll } from './paginatedService'
 
 const STOCK_MOVEMENT_FIELDS = `
   id,
@@ -33,9 +33,9 @@ export async function getStockMovements(productId) {
 
   params.set('select', STOCK_MOVEMENT_FIELDS)
   params.set('product_id', `eq.${productId}`)
-  params.set('order', 'created_at.desc')
+  params.set('order', 'id.asc')
 
-  const data = await apiClient.get(`/stock_movements?${params.toString()}`)
+  const data = await getAll('stock_movements', params)
 
-  return data.map(mapStockMovement)
+  return data.map(mapStockMovement).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 }

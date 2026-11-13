@@ -4,6 +4,8 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { PRODUCT_CATEGORIES } from '../../constants/productCategories'
 import { PRODUCT_STATUS_OPTIONS, PRODUCT_STATUS } from '../../constants/productStatuses'
 import { PRODUCT_UNITS } from '../../constants/productUnits'
+import { PERMISSION } from '../../constants/permissions'
+import { usePermissions } from '../../composables/usePermissions'
 
 import BaseTextInput from '../base/BaseTextInput.vue'
 import BaseTextArea from '../base/BaseTextArea.vue'
@@ -43,9 +45,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showOpeningStock: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['submit', 'cancel'])
+const { hasPermission } = usePermissions()
 
 const { defineField, errors, handleSubmit, resetForm } = useForm({
   validationSchema: toTypedSchema(props.validationSchema),
@@ -196,7 +203,10 @@ const fields = {
             <p v-if="errors.status" class="invalid">{{ errors.status }}</p>
           </div>
 
-          <div class="form-group">
+          <div
+            v-if="showOpeningStock && hasPermission(PERMISSION.INVENTORY_ADJUST)"
+            class="form-group"
+          >
             <BaseTextInput
               name="stockQuantity"
               id="stockQuantity"
@@ -204,11 +214,15 @@ const fields = {
               :error="errors.stockQuantity"
               :class="{ 'is-invalid': errors.stockQuantity }"
               type="number"
-              label="Stock Quantity"
+              step="any"
+              label="Opening Stock Quantity"
               placeholder="Enter stock quantity"
             />
             <p v-if="errors.stockQuantity" class="invalid">{{ errors.stockQuantity }}</p>
           </div>
+          <p v-else-if="showOpeningStock">
+            Opening stock can be added by Admin or Operations after the product is created.
+          </p>
         </div>
       </template>
     </BaseFormSection>

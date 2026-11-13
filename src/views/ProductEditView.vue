@@ -61,6 +61,7 @@ async function update(values) {
     v-else-if="product"
     submit-label="Update Product"
     :initial-values="product"
+    :show-opening-stock="false"
     :loading="saving"
     :validation-schema="updateProductSchema"
     @submit="update"

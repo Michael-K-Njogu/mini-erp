@@ -137,7 +137,7 @@ export async function createProduct(product) {
 }
 
 export async function updateProduct(id, product) {
-  const apiProduct = mapProductToApi(product)
+  const { stock_quantity: _stockQuantity, ...apiProduct } = mapProductToApi(product)
 
   const data = await apiClient.patch(`${RESOURCE_PATH}?id=eq.${id}`, apiProduct, {
     headers: {

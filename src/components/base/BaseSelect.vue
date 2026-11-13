@@ -34,6 +34,10 @@ defineProps({
     type: String,
     default: '',
   },
+  ariaLabel: {
+    type: String,
+    default: undefined,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -47,7 +51,14 @@ function handleChange(event) {
   <div class="base-select-wrapper">
     <BaseFormLabel :label="label" :for="id" v-if="showLabel" />
 
-    <select class="base-select" :name="name" :id="id" :value="modelValue" @change="handleChange">
+    <select
+      class="base-select"
+      :name="name"
+      :id="id"
+      :value="modelValue"
+      :aria-label="ariaLabel"
+      @change="handleChange"
+    >
       <option value="">{{ allOptionsSelectedText }}</option>
       <option v-for="option in options" :key="option.value" :value="option.value">
         {{ option.label }}
