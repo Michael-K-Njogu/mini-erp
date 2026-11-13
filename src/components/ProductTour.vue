@@ -207,6 +207,9 @@ onBeforeUnmount(() => {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
   background: var(--color-bg-elevated);
+  background: color-mix(in srgb, var(--color-bg-elevated) 60%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   color: var(--color-text-primary);
   box-shadow: var(--shadow-default);
 }
@@ -221,6 +224,7 @@ onBeforeUnmount(() => {
 }
 
 .tour-dialog p {
+  font-size: var(--font-size-sm);
   margin: var(--space-2) 0;
 }
 
