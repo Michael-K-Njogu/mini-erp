@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { Upload, ImagePlus as ImageIcon, X } from '@lucide/vue'
 
 import BaseButton from './BaseButton.vue'
@@ -17,7 +17,7 @@ const props = defineProps({
 
   hint: {
     type: String,
-    default: 'JPG, PNG, GIF up to 2MB',
+    default: 'Drag and drop or upload a JPG or PNG up to 2MB',
   },
 
   error: {
@@ -66,7 +66,8 @@ function openFilePicker() {
 }
 
 function handleFileChange(event) {
-  const file = event.target.files?.[0]
+  if (props.disabled || props.uploadDisabled) return
+  const file = event.dataTransfer?.files?.[0] || event.target.files?.[0]
 
   if (!file) return
 
@@ -77,14 +78,14 @@ function handleFileChange(event) {
   if (!allowedTypes.includes(file.type)) {
     uploadError.value = 'Please upload a JPG or PNG image.'
 
-    event.target.value = ''
+    if (event.target.type === 'file') event.target.value = ''
     return
   }
 
   if (file.size > 2 * 1024 * 1024) {
     uploadError.value = 'Image size must be less than or equal to 2MB.'
 
-    event.target.value = ''
+    if (event.target.type === 'file') event.target.value = ''
     return
   }
 
@@ -96,10 +97,15 @@ function handleFileChange(event) {
 
   emit('update:modelValue', file)
 
-  event.target.value = ''
+  if (event.target.type === 'file') event.target.value = ''
 }
 
+onBeforeUnmount(() => {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+})
+
 function removeImage() {
+  if (props.disabled) return
   if (previewUrl.value) {
     URL.revokeObjectURL(previewUrl.value)
     previewUrl.value = null
@@ -115,10 +121,11 @@ function removeImage() {
       {{ label }}
     </label>
 
-    <div class="image-upload-content">
+    <div class="image-upload-content" @dragover.prevent @drop.prevent="handleFileChange">
       <button
         type="button"
         class="image-preview"
+        :aria-label="label"
         :style="{
           width: `${size}px`,
           height: `${size}px`,

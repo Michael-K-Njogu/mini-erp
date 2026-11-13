@@ -401,3 +401,18 @@ created.
 See [ROADMAP.md](ROADMAP.md) for completed functionality, current gaps, and planned
 operations, reporting, invoicing and payments, inventory, governance, and
 integration work.
+
+### Product images
+
+Apply `supabase/migrations/20261114000000_product_images.sql` before using product
+image uploads. It adds the nullable `products.image_url` column and a public
+`product-images` bucket limited to JPG/PNG files up to 2MB. Signed-in Admin and
+Sales users can upload into their own user-ID folder; demo uploads are disabled.
+Image URLs are publicly accessible, consistent with customer images.
+
+The product form accepts a file picker or drag and drop, with a preview and removal.
+The product table and detail page fall back to a placeholder when no image exists.
+Uploads occur before saving the product; failed saves clean up the new upload.
+Replacements, removals, and product deletion clean up old files after the database
+operation succeeds. Cleanup failures are logged and do not fail an otherwise
+successful save; these files may require later removal through the Storage API.

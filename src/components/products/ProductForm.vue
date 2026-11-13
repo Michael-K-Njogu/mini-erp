@@ -1,4 +1,7 @@
 <script setup>
+import { ref } from 'vue'
+import { useAuth } from '../../composables/useAuth'
+import BaseImageUpload from '../base/BaseImageUpload.vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { PRODUCT_CATEGORIES } from '../../constants/productCategories'
@@ -51,6 +54,9 @@ const props = defineProps({
   },
 })
 
+const { isDemo } = useAuth()
+const image = ref(props.initialValues.image || null)
+
 const emit = defineEmits(['submit', 'cancel'])
 const { hasPermission } = usePermissions()
 
@@ -60,7 +66,7 @@ const { defineField, errors, handleSubmit, resetForm } = useForm({
 })
 
 const onSubmit = handleSubmit((values) => {
-  emit('submit', values)
+  emit('submit', { ...values, image: image.value })
 })
 
 const fields = {
@@ -83,6 +89,15 @@ const fields = {
         <Info />
       </template>
       <template #content>
+        <BaseImageUpload
+          v-model="image"
+          label="Product image (optional)"
+          :disabled="loading"
+          :upload-disabled="isDemo"
+        />
+        <p v-if="isDemo" class="image-upload-hint">
+          Product image uploads are unavailable in demo accounts.
+        </p>
         <div class="form-grid">
           <div class="form-group">
             <BaseTextInput

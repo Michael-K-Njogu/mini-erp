@@ -1,4 +1,5 @@
 <script setup>
+import ProductImage from '../components/products/ProductImage.vue'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -143,7 +144,18 @@ async function deleteCurrentProduct() {
 
     <template v-else-if="product">
       <section class="product-hero" aria-labelledby="product-name">
-        <div class="product-image-placeholder" role="img" aria-label="Product image placeholder">
+        <ProductImage
+          v-if="product.image"
+          class="product-photo"
+          :src="product.image"
+          :name="product.name"
+        />
+        <div
+          v-else
+          class="product-image-placeholder"
+          role="img"
+          aria-label="Product image placeholder"
+        >
           <div class="placeholder-artwork">
             <Package :size="72" :stroke-width="1.25" aria-hidden="true" />
           </div>
@@ -519,5 +531,12 @@ async function deleteCurrentProduct() {
   .product-information-item:last-child {
     border-bottom: 0;
   }
+}
+</style>
+
+<style scoped>
+.product-photo {
+  width: 100%;
+  height: 320px;
 }
 </style>

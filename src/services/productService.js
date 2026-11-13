@@ -1,5 +1,7 @@
 import { apiClient } from '../api/apiClient'
 
+import { uploadProductImage, deleteProductImage } from './productImageService'
+
 const RESOURCE_PATH = '/products'
 
 const SORT_FIELD_MAP = {
@@ -13,6 +15,7 @@ const SORT_FIELD_MAP = {
 }
 
 export const PRODUCT_FIELDS = {
+  image: 'image_url',
   id: 'id',
   sku: 'sku',
   name: 'name',
@@ -29,6 +32,7 @@ export const PRODUCT_FIELDS = {
 
 function mapProduct(product) {
   return {
+    image: product.image_url || null,
     id: product.id,
     sku: product.sku,
     name: product.name,
@@ -125,29 +129,46 @@ export async function getProductById(id, { signal } = {}) {
 }
 
 export async function createProduct(product) {
-  const apiProduct = mapProductToApi(product)
-
-  const data = await apiClient.post(RESOURCE_PATH, apiProduct, {
-    headers: {
-      Prefer: 'return=representation',
-    },
-  })
-
-  return mapProduct(data[0])
+  const imageUrl = product.image instanceof File ? await uploadProductImage(product.image) : null
+  try {
+    const data = await apiClient.post(
+      RESOURCE_PATH,
+      {
+        ...mapProductToApi(product),
+        image_url: imageUrl,
+      },
+      { headers: { Prefer: 'return=representation' } },
+    )
+    if (!data?.[0]) throw new Error('Product could not be created.')
+    return mapProduct(data[0])
+  } catch (error) {
+    await deleteProductImage(imageUrl)
+    throw error
+  }
 }
 
 export async function updateProduct(id, product) {
   const { stock_quantity: _stockQuantity, ...apiProduct } = mapProductToApi(product)
-
-  const data = await apiClient.patch(`${RESOURCE_PATH}?id=eq.${id}`, apiProduct, {
-    headers: {
-      Prefer: 'return=representation',
-    },
-  })
-
+  const imageChanged = product.image instanceof File || product.image === null
+  const existing = imageChanged ? await getProductById(id) : null
+  const uploaded = product.image instanceof File ? await uploadProductImage(product.image) : null
+  if (imageChanged) apiProduct.image_url = uploaded
+  let data
+  try {
+    data = await apiClient.patch(`${RESOURCE_PATH}?id=eq.${id}`, apiProduct, {
+      headers: { Prefer: 'return=representation' },
+    })
+    if (!data?.[0]) throw new Error('Product could not be updated.')
+  } catch (error) {
+    await deleteProductImage(uploaded)
+    throw error
+  }
+  if (imageChanged) await deleteProductImage(existing.image)
   return mapProduct(data[0])
 }
 
 export async function deleteProduct(id) {
+  const product = await getProductById(id)
   await apiClient.delete(`${RESOURCE_PATH}?id=eq.${id}`)
+  await deleteProductImage(product.image)
 }

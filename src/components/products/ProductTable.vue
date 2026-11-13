@@ -1,4 +1,5 @@
 <script setup>
+import ProductImage from './ProductImage.vue'
 // Utilities
 import { formatCurrency, formatDate } from '../../utils/formatters'
 import { PRODUCT_STATUS } from '../../constants/productStatuses.js'
@@ -90,8 +91,14 @@ function showProductUnit(product) {
 
     <tbody>
       <tr v-for="product in products" :key="product.id">
+        <td>
+          <div class="product-name-cell">
+            <ProductImage :src="product.image" :name="product.name" /><span>{{
+              product.name
+            }}</span>
+          </div>
+        </td>
         <td>{{ product.sku }}</td>
-        <td>{{ product.name }}</td>
         <td>{{ product.category }}</td>
         <td>{{ formatCurrency(product.sellingPrice) }}</td>
         <td>{{ showProductUnit(product) }}</td>
@@ -150,3 +157,11 @@ function showProductUnit(product) {
     </tbody>
   </table>
 </template>
+
+<style scoped>
+.product-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+</style>
