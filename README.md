@@ -107,7 +107,8 @@ gets a private, pre-seeded workspace with full CRUD access.
 2. Enable **Authentication → Sign In / Providers → Allow anonymous sign-ins**.
 3. Apply every file in `supabase/migrations/` in order (SQL editor or
    `supabase db push`). `20261001000000_baseline_schema.sql` and
-   `20261008000000_demo_mode.sql` are for the demo project only.
+   `20261008000000_demo_mode.sql` and `20261113230000_refresh_demo_seed.sql`
+   are for the demo project only.
 4. Put the demo project's URL and anon key in `.env.demo` (git-ignored) with
    `VITE_ENABLE_DEMO=true`, then run `npm run dev:demo`. Plain `npm run dev` keeps
    using `.env`, so you can switch between the main and demo projects. On the
@@ -262,6 +263,105 @@ Migration files, in timestamp order:
 - `20261113210000_product_tour.sql`: stores tour completion per user with row-level
   security and provides a transactional demo workspace and tour reset. Apply it
   to both production and demo projects before deploying the application.
+- `20261113220000_inventory_integration.sql`: connects product stock, inventory,
+  adjustments and order transitions. Apply it to both projects during a
+  maintenance window, before deploying the matching application. The old and
+  new applications are not both compatible with this migration: order creation
+  changes to a transactional RPC. Review existing production functions,
+  triggers, grants and RLS policies before applying it.
+- `20261113230000_refresh_demo_seed.sql`: replaces the sample seed for new
+  demo visitors and demo resets. Apply only to the demo project, after the
+  inventory integration migration. It does not modify existing workspaces.
+
+### Inventory migration preflight
+
+Back up each database and review these read-only queries before applying the
+inventory migration. The migration locks the relevant tables and rolls back if
+product and inventory balances or owners disagree, existing quantities are
+invalid, or reservations do not match pending and processing orders. It never
+chooses a winner for conflicting data. Investigate and explicitly reconcile
+discrepancies before retrying; do not blindly replace balances. Completed orders
+are treated as historical and are not deducted again.
+
+```sql
+-- Existing product/inventory conflicts; owner_id is present only in demo.
+SELECT p.id, p.sku, p.stock_quantity, i.quantity_on_hand,
+       to_jsonb(p)->>'owner_id' AS product_owner,
+       to_jsonb(i)->>'owner_id' AS inventory_owner
+FROM public.products p JOIN public.inventory i ON i.product_id = p.id
+WHERE p.stock_quantity IS DISTINCT FROM i.quantity_on_hand
+   OR to_jsonb(p)->>'owner_id' IS DISTINCT FROM to_jsonb(i)->>'owner_id';
+
+-- Existing reservations versus the quantities on open orders.
+SELECT p.id, p.sku, i.quantity_on_hand, i.quantity_reserved,
+       coalesce(r.order_reserved, 0) AS order_reserved
+FROM public.products p
+LEFT JOIN public.inventory i ON i.product_id = p.id
+LEFT JOIN (
+  SELECT oi.product_id, sum(oi.quantity) AS order_reserved
+  FROM public.order_items oi JOIN public.orders o ON o.id = oi.order_id
+  WHERE o.status IN ('Pending', 'Processing')
+  GROUP BY oi.product_id
+) r ON r.product_id = p.id
+WHERE coalesce(i.quantity_reserved, 0) <> coalesce(r.order_reserved, 0);
+
+-- Invalid balances and open-order quantities require individual review.
+SELECT id, product_id, quantity_on_hand, quantity_reserved
+FROM public.inventory
+WHERE quantity_on_hand IS NULL OR quantity_reserved IS NULL
+   OR quantity_on_hand < 0 OR quantity_reserved < 0
+   OR quantity_reserved > quantity_on_hand
+   OR quantity_on_hand IN ('NaN'::numeric, 'Infinity'::numeric)
+   OR quantity_reserved IN ('NaN'::numeric, 'Infinity'::numeric);
+
+SELECT o.id AS order_id, oi.id AS item_id, oi.product_id, oi.quantity
+FROM public.order_items oi JOIN public.orders o ON o.id = oi.order_id
+WHERE o.status IN ('Pending', 'Processing')
+  AND (oi.quantity IS NULL OR oi.quantity <= 0
+       OR oi.quantity IN ('NaN'::numeric, 'Infinity'::numeric));
+
+-- Cross-owner open order items are invalid in the isolated demo.
+SELECT o.id AS order_id, oi.id AS item_id, p.id AS product_id,
+       to_jsonb(o)->>'owner_id' AS order_owner,
+       to_jsonb(p)->>'owner_id' AS product_owner
+FROM public.order_items oi JOIN public.orders o ON o.id = oi.order_id
+JOIN public.products p ON p.id = oi.product_id
+WHERE o.status IN ('Pending', 'Processing')
+  AND to_jsonb(o)->>'owner_id' IS DISTINCT FROM to_jsonb(p)->>'owner_id';
+
+-- Products for which the migration would create an inventory record.
+SELECT p.id, p.sku, p.stock_quantity
+FROM public.products p
+LEFT JOIN public.inventory i ON i.product_id = p.id
+WHERE i.id IS NULL;
+```
+
+In particular, existing demo workspaces may contain illustrative reservations
+that do not match their seeded orders, so they can fail preflight. Existing demo
+data is not automatically reset. The refreshed demo seed contains healthy, low
+and out-of-stock products, all five order states, and movement histories that
+reconcile with stock on hand. Reservations match open orders.
+
+After both inventory and demo-seed migrations are applied, new demo visitors
+are seeded automatically. Existing visitors can use **Reset demo** to replace
+their workspace and reset their tour progress. To seed all existing anonymous
+accounts after a complete workspace-data purge, an administrator can instead run
+`supabase/demo/seed_existing_workspaces.sql` in the confirmed demo project. It
+does not touch Auth users, profiles, tour progress or Storage objects. It fails
+and rolls back if any anonymous workspace is not empty or lacks a profile; it
+never silently overwrites data. Pause demo access while applying the migrations
+and seeding so new workspaces cannot be created between purge and migration.
+
+Inventory on hand is the stock source of truth; `products.stock_quantity` is
+kept in sync for existing product displays. New products get an inventory record
+and an opening movement when stock is supplied. Subsequent changes must use
+stock adjustments; product editing cannot change the balance. Only Admin and
+Operations can set a nonzero opening balance. Admin and
+Operations can adjust stock, while Admin, Sales and Operations can view it.
+Posting reserves available stock, cancellation releases the reservation, and
+completion deducts it and records a movement. Insufficient stock blocks posting.
+Fractional quantities are supported. A product with stock or movement history
+cannot be deleted. Low-stock alert configuration and returns remain future work.
 
 For existing users without profiles, an administrator must insert a profile
 using the Auth user's UUID as `profiles.id` and an explicitly chosen role.
