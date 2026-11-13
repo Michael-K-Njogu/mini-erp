@@ -843,12 +843,18 @@ select {
 
   padding-right: 36px;
 
-  /* Inject the new custom arrow icon via background-image */
-  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tZG93bi1pY29uIGx1Y2lkZS1jaGV2cm9uLWRvd24iPjxwYXRoIGQ9Im02IDkgNiA2IDYtNiIvPjwvc3ZnPg==');
+  background-image: var(--icon-select-chevron);
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 16px;
   cursor: pointer;
+}
+
+@media (forced-colors: active) {
+  select {
+    appearance: auto;
+    background-image: none;
+  }
 }
 
 .required {
@@ -878,13 +884,33 @@ select {
 
 .search-input-container:focus-within {
   border-color: var(--color-interactive-default);
+  box-shadow: 0 0 0 2px var(--color-border-focus);
 }
 
-.search-input {
+.search-input-container .search-input {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 44px;
   width: 100%;
+  padding: 0 var(--space-3) 0 0;
   border: none;
+  border-radius: 0;
   outline: none;
-  font-size: 14px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: var(--font-weight-regular) var(--font-size-sm) / 24px var(--font-family-primary);
+}
+
+.search-input-container .search-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+@media (forced-colors: active) {
+  .search-input-container:focus-within {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
 }
 
 .page-toolbar-region {
