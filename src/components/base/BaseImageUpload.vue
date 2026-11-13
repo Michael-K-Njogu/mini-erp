@@ -30,6 +30,11 @@ const props = defineProps({
     default: false,
   },
 
+  uploadDisabled: {
+    type: Boolean,
+    default: false,
+  },
+
   size: {
     type: Number,
     default: 100,
@@ -55,7 +60,7 @@ const preview = computed(() => {
 })
 
 function openFilePicker() {
-  if (props.disabled) return
+  if (props.disabled || props.uploadDisabled) return
 
   fileInput.value?.click()
 }
@@ -118,7 +123,7 @@ function removeImage() {
           width: `${size}px`,
           height: `${size}px`,
         }"
-        :disabled="disabled"
+        :disabled="disabled || uploadDisabled"
         @click="openFilePicker"
       >
         <img v-if="preview" :src="preview" alt="" />
@@ -133,7 +138,7 @@ function removeImage() {
             label="Upload Image"
             variant="secondary"
             size="md"
-            :disabled="disabled"
+            :disabled="disabled || uploadDisabled"
             @click="openFilePicker"
           />
 
@@ -167,6 +172,7 @@ function removeImage() {
       ref="fileInput"
       type="file"
       accept="image/jpeg,image/png"
+      :disabled="disabled || uploadDisabled"
       hidden
       @change="handleFileChange"
     />
