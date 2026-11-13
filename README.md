@@ -123,6 +123,16 @@ The demo migration adds:
   their data after 24 hours
 - a size- and type-restricted `customer-images` storage bucket
 
+Customer image uploads are disabled for anonymous demo accounts because resetting
+or expiring a demo removes database records but not storage objects. Existing
+objects in the public `customer-images` bucket are not removed by this change;
+an administrator must review and remove any orphaned images through the Supabase
+Storage API. Customer creation still works without an image.
+For other accounts, if image upload or association fails after a customer is
+created, the app reports the partial save and directs the user to check the
+existing customer before retrying. An uncertain image update may leave an
+unreferenced object that requires administrator cleanup through the Storage API.
+
 `netlify.toml` configures the Netlify build and rewrites all routes to `index.html`
 so deep links work. Vite embeds `VITE_*` values at build time, so each Netlify site
 targets one Supabase project: create one site with the demo project's variables
@@ -231,6 +241,9 @@ Migration files, in timestamp order:
   error creating the profile will prevent the user from being created. Any
   enabled public sign-up can therefore create a `Sales` profile; configure
   Supabase Auth sign-up settings accordingly.
+- `20261113200000_restrict_demo_customer_images.sql`: prevents anonymous demo
+  accounts from uploading or replacing customer images, including through other
+  permissive storage policies. Apply it to the demo project to enforce this rule.
 
 For existing users without profiles, an administrator must insert a profile
 using the Auth user's UUID as `profiles.id` and an explicitly chosen role.
