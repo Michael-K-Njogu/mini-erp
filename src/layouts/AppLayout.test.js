@@ -5,9 +5,24 @@ import AppLayout from './AppLayout.vue'
 
 const route = reactive({ fullPath: '/' })
 const collapsed = ref(false)
+const user = ref({ id: 'user-1' })
+const permissions = ref([])
+const getCompletion = vi.fn()
+const completeTour = vi.fn()
+const showError = vi.fn()
 
 vi.mock('vue-router', () => ({ useRoute: () => route }))
 vi.mock('../composables/useSidebar.js', () => ({ useSidebar: () => ({ collapsed }) }))
+vi.mock('../composables/useAuth', () => ({ useAuth: () => ({ user }) }))
+vi.mock('../composables/usePermissions', () => ({
+  usePermissions: () => ({ hasPermission: (permission) => permissions.value.includes(permission) }),
+}))
+vi.mock('../composables/useToast', () => ({ useToast: () => ({ error: showError }) }))
+vi.mock('../services/productTourService', () => ({
+  PRODUCT_TOUR_VERSION: 1,
+  getProductTourCompletion: (...args) => getCompletion(...args),
+  completeProductTour: (...args) => completeTour(...args),
+}))
 vi.mock('./AppHeader.vue', () => ({ default: { name: 'AppHeader' } }))
 vi.mock('./AppSidebar.vue', () => ({ default: { name: 'AppSidebar' } }))
 vi.mock('../components/DemoBanner.vue', () => ({ default: { name: 'DemoBanner' } }))
@@ -17,8 +32,12 @@ describe('responsive navigation', () => {
   let wrapper
 
   beforeEach(() => {
+    vi.clearAllMocks()
     route.fullPath = '/'
     collapsed.value = false
+    user.value = { id: 'user-1' }
+    permissions.value = []
+    getCompletion.mockResolvedValue(1)
     viewport = {
       matches: true,
       addEventListener: vi.fn(),
@@ -45,6 +64,7 @@ describe('responsive navigation', () => {
               '<aside v-show="!mobile || open" class="sidebar"><button class="sidebar-close" @click="$emit(\'close\')">Close</button><a href="/">Link</a></aside>',
           },
           DemoBanner: true,
+          ProductTour: true,
           RouterView: true,
         },
       },

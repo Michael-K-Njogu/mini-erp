@@ -29,6 +29,7 @@ defineProps({
     exact-active-class="active"
     :to="to"
     :data-label="title"
+    :data-tour-nav="to"
     :aria-label="collapsed ? title : undefined"
   >
     <component :is="icon" :size="iconSize" aria-hidden="true" />

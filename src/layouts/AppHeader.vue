@@ -7,13 +7,13 @@ import { useAuth } from '../composables/useAuth'
 import NotificationMenu from '../components/notifications/NotificationMenu.vue'
 import ThemeToggle from '../components/theme/ThemeToggle.vue'
 import UserMenu from '../components/user/UserMenu.vue'
-import { ChevronRight, Menu } from '@lucide/vue'
+import { ChevronRight, CircleHelp, Menu } from '@lucide/vue'
 
 defineProps({
   mobile: { type: Boolean, default: false },
   navigationOpen: { type: Boolean, default: false },
 })
-defineEmits(['open-navigation'])
+defineEmits(['open-navigation', 'start-tour'])
 
 const route = useRoute()
 const router = useRouter()
@@ -119,6 +119,15 @@ async function handleSignOut() {
     </div>
 
     <div class="header-actions">
+      <button
+        class="tour-button"
+        type="button"
+        aria-label="Take the product tour"
+        title="Take the product tour"
+        @click="$emit('start-tour')"
+      >
+        <CircleHelp :size="20" aria-hidden="true" />
+      </button>
       <ThemeToggle />
 
       <NotificationMenu />
@@ -147,7 +156,8 @@ async function handleSignOut() {
   flex-shrink: 0;
 }
 
-.mobile-navigation-toggle {
+.mobile-navigation-toggle,
+.tour-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -162,7 +172,8 @@ async function handleSignOut() {
   cursor: pointer;
 }
 
-.mobile-navigation-toggle:focus-visible {
+.mobile-navigation-toggle:focus-visible,
+.tour-button:focus-visible {
   outline: 2px solid var(--color-border-focus);
 }
 

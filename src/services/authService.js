@@ -24,7 +24,7 @@ export async function signInAnonymously() {
 }
 
 export async function resetDemoData() {
-  const { error } = await supabase.rpc('reset_demo_data')
+  const { error } = await supabase.rpc('reset_demo_data_with_tour')
 
   if (error) {
     throw new Error(error.message)

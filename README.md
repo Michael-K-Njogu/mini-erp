@@ -118,7 +118,7 @@ The demo migration adds:
 - `owner_id` columns with row level security, so visitors only see their own data
 - a sign-up trigger that creates an Admin profile and seeds sample customers,
   products, inventory, orders, and notifications
-- `reset_demo_data()` (used by the banner's **Reset data** button)
+- `reset_demo_data()` (called by the banner's transactional workspace and tour reset)
 - per-user row caps and an hourly `pg_cron` job that deletes anonymous users and
   their data after 24 hours
 - a size- and type-restricted `customer-images` storage bucket
@@ -137,6 +137,21 @@ unreferenced object that requires administrator cleanup through the Storage API.
 so deep links work. Vite embeds `VITE_*` values at build time, so each Netlify site
 targets one Supabase project: create one site with the demo project's variables
 (`VITE_ENABLE_DEMO=true`) and, if wanted, a second site with the main project's.
+
+## Product Tour
+
+The product tour opens automatically for accounts that have not completed or
+skipped the current tour, including existing users. Completion is stored per
+account, so it follows users across devices. The help button in the header
+replays the tour, and steps reflect the navigation available to the user's role.
+In an anonymous demo, the tour starts on the first visit and **Reset data**
+clears completion together with the workspace, so the tour starts again after
+the reset. If completion cannot be loaded or saved, the app reports the error;
+users can retry or close without saving.
+
+Apply `20261113210000_product_tour.sql` to both production and demo databases
+before deploying this version of the app. The demo must also have the demo-mode
+migration: the new reset RPC calls its existing `reset_demo_data()` function.
 
 ## Local Mocking
 
@@ -244,6 +259,9 @@ Migration files, in timestamp order:
 - `20261113200000_restrict_demo_customer_images.sql`: prevents anonymous demo
   accounts from uploading or replacing customer images, including through other
   permissive storage policies. Apply it to the demo project to enforce this rule.
+- `20261113210000_product_tour.sql`: stores tour completion per user with row-level
+  security and provides a transactional demo workspace and tour reset. Apply it
+  to both production and demo projects before deploying the application.
 
 For existing users without profiles, an administrator must insert a profile
 using the Auth user's UUID as `profiles.id` and an explicitly chosen role.

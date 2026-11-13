@@ -44,6 +44,7 @@ building-materials business.
 - [x] Full notifications page with entity navigation and empty/error states
 - [x] Login, session initialization, protected routes, and sign-out
 - [x] Role-aware navigation and action-level permission checks
+- [x] Account-aware product tour with role-aware navigation, replay, and demo reset
 - [x] Prettier formatting with format and format-check scripts
 
 ### Application Foundation
