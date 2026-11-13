@@ -5,6 +5,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { customerTypes } from '../../constants/customerTypes.js'
 import { SECTORS } from '../../constants/industryTypes.js'
 import { REGIONS } from '../../constants/regions.js'
+import { useAuth } from '../../composables/useAuth'
 
 import BaseFormLabel from '../base/BaseFormLabel.vue'
 import BaseSelect from '../base/BaseSelect.vue'
@@ -64,6 +65,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['submit', 'cancel'])
+const { isDemo } = useAuth()
 
 const { defineField, errors, handleSubmit, resetForm } = useForm({
   validationSchema: toTypedSchema(props.validationSchema),
@@ -113,7 +115,11 @@ const fields = {
             v-model="fields.image.value"
             label="Customer / Business Logo"
             hint="Upload a JPG, JPEG or PNG, max 2MB."
+            :upload-disabled="isDemo"
           />
+          <p v-if="isDemo" class="image-upload-hint">
+            Customer image uploads are unavailable in demo accounts.
+          </p>
           <p v-if="errors.image" class="invalid">{{ errors.image }}</p>
         </div>
 

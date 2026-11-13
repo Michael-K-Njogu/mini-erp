@@ -210,27 +210,35 @@ export async function createCustomer(customer) {
     throw new Error('Customer could not be created.')
   }
 
-  let imageUrl = null
-
   if (customer.image instanceof File) {
-    imageUrl = await uploadCustomerImage(createdCustomer.id, customer.image)
+    try {
+      const imageUrl = await uploadCustomerImage(createdCustomer.id, customer.image)
 
-    const updatedCustomers = await apiClient.patch(
-      `/customers?id=eq.${createdCustomer.id}`,
-      {
-        image_url: imageUrl,
-      },
-      {
-        headers: {
-          Prefer: 'return=representation',
+      const updatedCustomers = await apiClient.patch(
+        `/customers?id=eq.${createdCustomer.id}`,
+        {
+          image_url: imageUrl,
         },
-      },
-    )
+        {
+          headers: {
+            Prefer: 'return=representation',
+          },
+        },
+      )
 
-    return mapCustomer(updatedCustomers[0])
+      if (!updatedCustomers?.[0]) {
+        throw new Error('The saved customer image could not be confirmed.')
+      }
+      return { customer: mapCustomer(updatedCustomers[0]), imageError: null }
+    } catch (imageError) {
+      return {
+        customer: mapCustomer(createdCustomer),
+        imageError: imageError || new Error('Customer image could not be confirmed.'),
+      }
+    }
   }
 
-  return mapCustomer(createdCustomer)
+  return { customer: mapCustomer(createdCustomer), imageError: null }
 }
 
 export async function updateCustomer(id, customer) {

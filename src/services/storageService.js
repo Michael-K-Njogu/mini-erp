@@ -1,7 +1,21 @@
+import { supabase } from '../api/supabaseClient'
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const API_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 const CUSTOMER_IMAGE_BUCKET = 'customer-images'
+
+async function getAuthorizationHeader({ upload = false } = {}) {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
+  if (!data.session?.access_token) {
+    throw new Error('You must be signed in to manage customer images.')
+  }
+  if (upload && data.session.user?.is_anonymous) {
+    throw new Error('Customer image uploads are unavailable in demo accounts.')
+  }
+  return `Bearer ${data.session.access_token}`
+}
 
 export async function uploadCustomerImage(customerId, file) {
   if (!(file instanceof File)) {
@@ -11,6 +25,7 @@ export async function uploadCustomerImage(customerId, file) {
   const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
 
   const filePath = `${customerId}/logo-${crypto.randomUUID()}.${extension}`
+  const authorization = await getAuthorizationHeader({ upload: true })
 
   const response = await fetch(
     `${SUPABASE_URL}/storage/v1/object/${CUSTOMER_IMAGE_BUCKET}/${filePath}`,
@@ -18,7 +33,7 @@ export async function uploadCustomerImage(customerId, file) {
       method: 'POST',
       headers: {
         apikey: API_KEY,
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: authorization,
         'Content-Type': file.type,
         'x-upsert': 'false',
       },
@@ -58,6 +73,7 @@ export async function deleteCustomerImage(imageUrl) {
   }
 
   const filePath = imageUrl.substring(markerIndex + marker.length)
+  const authorization = await getAuthorizationHeader()
 
   const response = await fetch(
     `${SUPABASE_URL}/storage/v1/object/${CUSTOMER_IMAGE_BUCKET}/${filePath}`,
@@ -65,7 +81,7 @@ export async function deleteCustomerImage(imageUrl) {
       method: 'DELETE',
       headers: {
         apikey: API_KEY,
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: authorization,
       },
     },
   )
