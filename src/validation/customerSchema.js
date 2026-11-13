@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+const phoneNumberPattern = /^(?:\+?[1-9]\d{1,14}|0\d{1,14})$/
+
 const customerImageSchema = z
   .union([z.string().url(), z.instanceof(File)])
   .refine(
@@ -22,11 +24,14 @@ const baseCustomerSchema = z.object({
 
   email: z.string().email({ message: 'Invalid email address' }),
 
-  phonePrimary: z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: 'Invalid phone number' }),
+  phonePrimary: z
+    .string({ required_error: 'Primary phone number is required' })
+    .min(1, { message: 'Primary phone number is required' })
+    .regex(phoneNumberPattern, { message: 'Invalid phone number' }),
 
   phoneSecondary: z
     .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, { message: 'Invalid phone number' })
+    .regex(phoneNumberPattern, { message: 'Invalid phone number' })
     .optional()
     .or(z.literal('')),
 
@@ -34,7 +39,9 @@ const baseCustomerSchema = z.object({
 
   city: z.string().min(1, { message: 'City or town is required' }),
 
-  contactPerson: z.string().min(1, { message: 'Contact person is required' }),
+  contactPerson: z
+    .string({ required_error: 'Contact person is required' })
+    .min(1, { message: 'Contact person is required' }),
 
   deliveryAddress: z.string().min(1, { message: 'Delivery address is required' }),
 
