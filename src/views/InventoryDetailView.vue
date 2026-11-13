@@ -160,6 +160,11 @@ function goBack() {
   router.push({ name: 'inventory' })
 }
 
+function openStockAdjustment() {
+  adjustmentError.value = ''
+  showAdjustmentModal.value = true
+}
+
 async function handleStockAdjustment(values) {
   if (!inventory.value || adjusting.value) return
 
@@ -198,12 +203,7 @@ onMounted(loadPage)
       <template #actions>
         <BaseButton label="Back to Inventory" size="sm" variant="secondary" @click="goBack" />
 
-        <BaseButton
-          label="Adjust Stock"
-          size="sm"
-          variant="primary"
-          @click="showAdjustmentModal = true"
-        />
+        <BaseButton label="Adjust Stock" size="sm" variant="primary" @click="openStockAdjustment" />
       </template>
     </PageToolbar>
 
@@ -212,15 +212,12 @@ onMounted(loadPage)
       :loading="adjusting"
       :product="inventory?.product"
       :availableQuantity="availableQuantity"
+      :error="adjustmentError"
       @close="showAdjustmentModal = false"
       @submit="handleStockAdjustment"
     />
 
     <main class="inventory-detail-content">
-      <p v-if="adjustmentError" class="adjustment-error" role="alert">
-        {{ adjustmentError }}
-      </p>
-
       <div v-if="loading" class="state-message">Loading inventory...</div>
 
       <div v-else-if="error" class="state-message error">
@@ -362,15 +359,6 @@ onMounted(loadPage)
   flex-direction: column;
   gap: 24px;
   min-width: 0;
-}
-
-.adjustment-error {
-  background: var(--color-feedback-error-subtle);
-  border: 1px solid var(--color-feedback-error);
-  border-radius: var(--border-radius-md);
-  color: var(--color-feedback-error);
-  margin: 0;
-  padding: 12px 16px;
 }
 
 .stock-overview,
