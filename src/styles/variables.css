@@ -1,7 +1,7 @@
 /* Non-colour design tokens. Colours live in themes.css. */
 :root {
   /* DDS primitive typography */
-  --font-family-primary: 'Inter', sans-serif;
+  --font-family-primary: 'Google Sans', sans-serif;
   --font-family-default: var(--font-family-primary);
   --font-size-2xs: 10px;
   --font-size-xs: 12px;
