@@ -274,7 +274,7 @@ const orderStatusBars = computed(() =>
   <form class="dashboard-filters" @submit.prevent="applyRange">
     <div class="dashboard-filter-range">
       <div>
-        <label for="dashboard-range">Date range</label>
+        <label class="visually-hidden" for="dashboard-range">Date range</label>
         <select id="dashboard-range" v-model="preset" :disabled="loading">
           <option value="7">Last 7 days</option>
           <option value="30">Last 30 days</option>
@@ -284,7 +284,7 @@ const orderStatusBars = computed(() =>
       </div>
       <template v-if="preset === 'custom'">
         <div>
-          <label for="dashboard-start">Start date</label>
+          <label class="visually-hidden" for="dashboard-start">Start date</label>
           <input
             id="dashboard-start"
             v-model="startDate"
@@ -294,7 +294,7 @@ const orderStatusBars = computed(() =>
           />
         </div>
         <div>
-          <label for="dashboard-end">End date</label>
+          <label class="visually-hidden" for="dashboard-end">End date</label>
           <input id="dashboard-end" v-model="endDate" type="date" :disabled="loading" required />
         </div>
       </template>
@@ -476,6 +476,16 @@ const orderStatusBars = computed(() =>
 </template>
 
 <style scoped>
+.visually-hidden {
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .dashboard-filters {
   display: flex;
   flex-wrap: wrap;

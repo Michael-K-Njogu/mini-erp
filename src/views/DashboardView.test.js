@@ -48,6 +48,24 @@ beforeEach(() => {
 })
 
 describe('dashboard', () => {
+  it('keeps visually hidden labels associated with all date filters', async () => {
+    const wrapper = mountDashboard()
+    await flushPromises()
+
+    const expectLabel = (id, text) => {
+      const input = wrapper.get(`#${id}`).element
+      expect(input.labels).toHaveLength(1)
+      expect(input.labels[0].textContent).toBe(text)
+      expect(input.labels[0].classList.contains('visually-hidden')).toBe(true)
+    }
+
+    expectLabel('dashboard-range', 'Date range')
+    await wrapper.get('#dashboard-range').setValue('custom')
+    expectLabel('dashboard-start', 'Start date')
+    expectLabel('dashboard-end', 'End date')
+    wrapper.unmount()
+  })
+
   it('loads creations and completed sales, applies custom dates, and exports the selected orders', async () => {
     const order = {
       id: 'o1',
