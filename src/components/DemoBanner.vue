@@ -15,6 +15,7 @@ const { isDemo, signOut } = useAuth()
 const { error: showError } = useToast()
 
 const resetting = ref(false)
+const exiting = ref(false)
 
 async function handleReset() {
   resetting.value = true
@@ -33,9 +34,18 @@ async function handleReset() {
 }
 
 async function handleExit() {
-  await signOut()
+  if (exiting.value || resetting.value) return
 
-  await router.replace({ name: 'login' })
+  exiting.value = true
+  try {
+    await signOut()
+    await router.replace({ name: 'login' })
+  } catch (err) {
+    console.error('Demo exit failed:', err)
+    showError(err.message || 'Unable to exit the demo.')
+  } finally {
+    exiting.value = false
+  }
 }
 </script>
 
@@ -53,20 +63,21 @@ async function handleExit() {
 
     <div class="demo-banner__actions">
       <BaseButton
-        label="Reset data"
+        :label="resetting ? 'Resetting...' : 'Reset data'"
         type="button"
         variant="secondary"
         size="sm"
         :loading="resetting"
-        :disabled="resetting"
+        :disabled="resetting || exiting"
         @click="handleReset"
       />
 
       <BaseButton
-        label="Exit demo"
+        :label="exiting ? 'Exiting...' : 'Exit demo'"
         type="button"
         variant="secondary"
         size="sm"
+        :disabled="exiting || resetting"
         @click="handleExit"
       />
     </div>
